@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { User, Plus, Trash2, Edit2, Shield, Lock, MapPin } from 'lucide-react';
-import { useAuth } from '../context/AuthContext'; 
+import { useAuth } from '../context/AuthContext';
 
 const Users = () => {
-    const { user } = useAuth(); 
+    const { user } = useAuth();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [branches, setBranches] = useState([]);
 
-    
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const [formData, setFormData] = useState({
@@ -23,8 +22,6 @@ const Users = () => {
         fetchUsers();
         fetchBranches();
     }, []);
-
-    
 
     const fetchUsers = async () => {
         try {
@@ -47,10 +44,7 @@ const Users = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
         try {
-            await axios.post('/api/users/delete.php', {
-                id,
-                admin_id: user.id 
-            });
+            await axios.post('/api/users/delete.php?id=' + id);
             fetchUsers();
         } catch (err) {
             alert("Failed to delete user");
@@ -60,7 +54,7 @@ const Users = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const payload = { ...formData, admin_id: user.id }; 
+            const payload = { ...formData, admin_id: user.id };
 
             if (editingUser) {
                 await axios.post('/api/users/update.php', { ...payload, id: editingUser.id });
@@ -79,7 +73,7 @@ const Users = () => {
         setEditingUser(user);
         setFormData({
             username: user.username,
-            password: '', // Leave blank to keep current
+            password: '',
             role: user.role,
             branch_id: user.branch_id || ''
         });
@@ -148,7 +142,6 @@ const Users = () => {
                 </div>
             )}
 
-            {}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-gray-800 border border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl">
@@ -161,7 +154,7 @@ const Users = () => {
                                     className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
                                     value={formData.username}
                                     onChange={e => setFormData({ ...formData, username: e.target.value })}
-                                    disabled={!!editingUser} 
+                                    disabled={!!editingUser}
                                     required
                                 />
                             </div>

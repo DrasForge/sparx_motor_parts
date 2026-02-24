@@ -23,18 +23,15 @@ const Inventory = () => {
         );
     }
 
-    
     const [branches, setBranches] = useState([]);
     const [selectedBranchId, setSelectedBranchId] = useState(user?.branch_id || 1);
 
-    
     const [debouncedSearch, setDebouncedSearch] = useState('');
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedSearch(search), 500);
         return () => clearTimeout(timer);
     }, [search]);
 
-    
     useEffect(() => {
         if (user.role === 'admin') {
             axios.get('/api/settings/update_branch.php')
@@ -46,9 +43,7 @@ const Inventory = () => {
     const fetchInventory = useCallback(async (page = 1) => {
         setLoading(true);
         try {
-            
             const branchId = user.role === 'admin' ? selectedBranchId : (user?.branch_id || 1);
-
             const res = await axios.get(`/api/inventory/read.php?page=${page}&limit=12&search=${debouncedSearch}&branch_id=${branchId}`);
             setProducts(res.data.data);
             setPagination(res.data.pagination);
@@ -63,7 +58,6 @@ const Inventory = () => {
         fetchInventory(pagination.current_page);
     }, [fetchInventory]);
 
-    
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= pagination.total_pages) {
             setPagination(prev => ({ ...prev, current_page: newPage }));
@@ -71,7 +65,6 @@ const Inventory = () => {
         }
     };
 
-    
     const getStockStatus = (qty, reorder) => {
         if (qty === 0) return { label: 'Out of Stock', color: 'text-red-400 bg-red-400/10' };
         if (qty <= reorder) return { label: 'Low Stock', color: 'text-yellow-400 bg-yellow-400/10' };
@@ -80,7 +73,6 @@ const Inventory = () => {
 
     return (
         <div>
-            {}
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold mb-2">Inventory Management</h1>
@@ -93,7 +85,7 @@ const Inventory = () => {
                             value={selectedBranchId}
                             onChange={(e) => {
                                 setSelectedBranchId(Number(e.target.value));
-                                setPagination(prev => ({ ...prev, current_page: 1 })); 
+                                setPagination(prev => ({ ...prev, current_page: 1 }));
                             }}
                         >
                             {branches.map(branch => (
@@ -111,7 +103,6 @@ const Inventory = () => {
                 </div>
             </div>
 
-            {}
             <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4 mb-6 flex gap-4">
                 <div className="relative flex-1">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -129,7 +120,6 @@ const Inventory = () => {
                 </button>
             </div>
 
-            {}
             {loading ? (
                 <div className="h-96 flex items-center justify-center">
                     <Loader className="animate-spin text-blue-500" size={40} />
@@ -137,7 +127,7 @@ const Inventory = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
                     {products.map((product) => {
-                        const status = getStockStatus(product.quantity, product.reorder_point);
+                        const status = getStockStatus(product.stock_quantity, product.reorder_point);
                         return (
                             <div key={product.id} className="bg-gray-800 border border-gray-700 rounded-xl p-5 hover:border-gray-600 transition-all group">
                                 <div className="flex justify-between items-start mb-4">
@@ -162,7 +152,7 @@ const Inventory = () => {
                                     </div>
                                     <div className="flex flex-col text-right">
                                         <span className="text-xs text-gray-400">Stock</span>
-                                        <span className="font-bold text-white">{product.quantity}</span>
+                                        <span className="font-bold text-white">{product.stock_quantity}</span>
                                     </div>
                                 </div>
 
@@ -189,7 +179,6 @@ const Inventory = () => {
                 </div>
             )}
 
-            {}
             {!loading && (
                 <div className="flex justify-between items-center bg-gray-800/50 p-4 border border-gray-700 rounded-xl">
                     <span className="text-gray-400 text-sm">
@@ -220,6 +209,7 @@ const Inventory = () => {
                 onClose={() => { setIsModalOpen(false); setEditingProduct(null); }}
                 onSuccess={() => fetchInventory(pagination.current_page)}
                 initialData={editingProduct}
+                branch_id={user.role === 'admin' ? selectedBranchId : (user?.branch_id || 1)}
             />
 
             <BarcodeViewer

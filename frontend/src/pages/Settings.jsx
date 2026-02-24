@@ -9,13 +9,10 @@ const Settings = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
-    
     const [passwordData, setPasswordData] = useState({ current: '', new: '', confirm: '' });
 
-    
     const [config, setConfig] = useState({ tax_rate: '' });
 
-    
     const [branches, setBranches] = useState([]);
     const [editingBranch, setEditingBranch] = useState(null);
 
@@ -103,7 +100,6 @@ const Settings = () => {
         <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold mb-8">Settings</h1>
 
-            {}
             <div className="flex gap-4 border-b border-gray-800 mb-8 overflow-x-auto">
                 <button
                     onClick={() => setActiveTab('profile')}
@@ -129,7 +125,6 @@ const Settings = () => {
                 )}
             </div>
 
-            {}
             <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 min-h-[400px]">
                 {message.text && (
                     <div className={`mb-6 p-4 rounded-lg flex items-center gap-2 ${message.type === 'success' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
@@ -189,15 +184,67 @@ const Settings = () => {
                         <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                             <SettingsIcon size={20} /> System Settings
                         </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Company Name</label>
+                                <input
+                                    type="text"
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
+                                    value={config.company_name || ''}
+                                    onChange={e => setConfig({ ...config, company_name: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Company TIN</label>
+                                <input
+                                    type="text"
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
+                                    value={config.company_tin || ''}
+                                    onChange={e => setConfig({ ...config, company_tin: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
                         <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-1">Tax Rate (%)</label>
+                            <label className="block text-sm font-medium text-gray-400 mb-1">Company Address</label>
+                            <textarea
+                                className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 outline-none h-20"
+                                value={config.company_address || ''}
+                                onChange={e => setConfig({ ...config, company_address: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Tax Rate (%)</label>
+                                <input
+                                    type="number"
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
+                                    value={config.tax_rate}
+                                    onChange={e => setConfig({ ...config, tax_rate: e.target.value })}
+                                    required
+                                    step="0.01"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Permit No / MIN</label>
+                                <input
+                                    type="text"
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
+                                    value={config.permit_no || ''}
+                                    onChange={e => setConfig({ ...config, permit_no: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-1">Receipt Footer</label>
                             <input
-                                type="number"
+                                type="text"
                                 className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
-                                value={config.tax_rate}
-                                onChange={e => setConfig({ ...config, tax_rate: e.target.value })}
-                                required
-                                step="0.01"
+                                value={config.receipt_footer || ''}
+                                onChange={e => setConfig({ ...config, receipt_footer: e.target.value })}
+                                placeholder="This serves as your official receipt..."
                             />
                         </div>
                         <button

@@ -1,33 +1,19 @@
 <?php
 include_once '../config/cors.php';
 include_once '../config/database.php';
-
-header("Content-Type: application/json; charset=UTF-8");
+include_once '../services/AuthService.php';
 
 $database = new Database();
 $db = $database->getConnection();
+$authService = new AuthService($db);
+
 $data = json_decode(file_get_contents("php://input"));
 
-if(isset($data->user_id)) {
-    
-    $code = rand(100000, 999999);
-    $expires = date('Y-m-d H:i:s', strtotime('+5 minutes'));
-
-    $query = "INSERT INTO otp_codes (user_id, code, expires_at) VALUES (:user_id, :code, :expires)";
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(":user_id", $data->user_id);
-    $stmt->bindParam(":code", $code);
-    $stmt->bindParam(":expires", $expires);
-
-    if($stmt->execute()) {
-        
-        echo json_encode(array("message" => "OTP sent.", "code" => $code)); 
-    } else {
-        http_response_code(503);
-        echo json_encode(array("message" => "Unable to send OTP."));
-    }
+if ($data && !empty($data->username)) {
+    $otp = $authService->generateOTP($data->username);
+    echo json_encode(["message" => "OTP sent.", "otp" => $otp]);
 } else {
     http_response_code(400);
-    echo json_encode(array("message" => "Incomplete data."));
+    echo json_encode(["message" => "Username required."]);
 }
 ?>

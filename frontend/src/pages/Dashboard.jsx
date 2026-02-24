@@ -11,24 +11,18 @@ import {
 const Dashboard = () => {
     const { user, logout } = useAuth();
 
-    
     const [adminData, setAdminData] = useState([]);
-
-    
     const [metrics, setMetrics] = useState({ sales_today: 0, orders_today: 0, low_stock: 0, recent_sales: [] });
     const [chartData, setChartData] = useState([]);
-
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 if (user.role === 'admin') {
-                    
                     const res = await axios.get('/api/analytics/branch_performance.php');
                     setAdminData(res.data);
                 } else {
-                    
                     const branchId = user.branch_id || '';
                     const [metricsRes, chartRes] = await Promise.all([
                         axios.get(`/api/analytics/dashboard_metrics.php?branch_id=${branchId}`),
@@ -45,7 +39,7 @@ const Dashboard = () => {
         };
 
         fetchData();
-        const interval = setInterval(fetchData, 5000); // Live refresh every 5s
+        const interval = setInterval(fetchData, 5000);
         return () => clearInterval(interval);
     }, [user]);
 
@@ -119,7 +113,6 @@ const Dashboard = () => {
                 </div>
             ) : (
                 <>
-                    {}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <KPITile
                             icon={DollarSign}
@@ -142,7 +135,6 @@ const Dashboard = () => {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {}
                         <div className="lg:col-span-2 bg-gray-800 p-6 rounded-xl border border-gray-700">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -167,7 +159,6 @@ const Dashboard = () => {
                             </div>
                         </div>
 
-                        {}
                         <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
                             <h3 className="text-lg font-bold text-white mb-6">Recent Sales</h3>
                             <div className="space-y-4">

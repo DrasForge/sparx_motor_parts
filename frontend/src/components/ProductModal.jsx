@@ -1,15 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { X, Loader } from 'lucide-react';
 
-const ProductModal = ({ isOpen, onClose, onSuccess, initialData }) => {
+const ProductModal = ({ isOpen, onClose, onSuccess, initialData, branch_id }) => {
     const [formData, setFormData] = useState({
         sku: '',
         name: '',
         category: '',
         price: '',
         cost_price: '',
-        supplier: ''
+        supplier: '',
+        stock_quantity: 0
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -24,10 +25,11 @@ const ProductModal = ({ isOpen, onClose, onSuccess, initialData }) => {
                     category: initialData.category || '',
                     price: initialData.price,
                     cost_price: initialData.cost_price || '',
-                    supplier: initialData.supplier_info || ''
+                    supplier: initialData.supplier_info || '',
+                    stock_quantity: initialData.stock_quantity || 0
                 });
             } else {
-                setFormData({ sku: '', name: '', category: '', price: '', cost_price: '', supplier: '' });
+                setFormData({ sku: '', name: '', category: '', price: '', cost_price: '', supplier: '', stock_quantity: 0 });
             }
             setError('');
         }
@@ -41,10 +43,11 @@ const ProductModal = ({ isOpen, onClose, onSuccess, initialData }) => {
         setError('');
 
         try {
+            const payload = { ...formData, branch_id: branch_id };
             if (initialData) {
-                await axios.post('/api/inventory/update_product.php', formData);
+                await axios.post('/api/inventory/update_product.php', payload);
             } else {
-                await axios.post('/api/inventory/create_product.php', formData);
+                await axios.post('/api/inventory/create_product.php', payload);
             }
             onSuccess();
             onClose();
@@ -132,6 +135,17 @@ const ProductModal = ({ isOpen, onClose, onSuccess, initialData }) => {
                             onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
                             className="w-full p-2 bg-gray-900 border border-gray-600 rounded-lg text-white"
                             placeholder="Supplier Name"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-blue-400">Stock Quantity (Current Branch)</label>
+                        <input
+                            type="number"
+                            value={formData.stock_quantity}
+                            onChange={(e) => setFormData({ ...formData, stock_quantity: parseInt(e.target.value) || 0 })}
+                            className="w-full p-2 bg-gray-900 border border-blue-500/30 rounded-lg text-white font-mono"
+                            placeholder="0"
                         />
                     </div>
 
