@@ -1,0 +1,66 @@
+[
+    {
+        "Field": "id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+    },
+    {
+        "Field": "sale_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+    },
+    {
+        "Field": "product_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+    },
+    {
+        "Field": "quantity",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+    },
+    {
+        "Field": "price",
+        "Type": "decimal(10,2)",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+    },
+    {
+        "Field": "price_at_sale",
+        "Type": "decimal(10,2)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "0.00",
+        "Extra": ""
+    },
+    {
+        "Field": "cost_price",
+        "Type": "decimal(10,2)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "0.00",
+        "Extra": ""
+    },
+    {
+        "Field": "subtotal",
+        "Type": "decimal(10,2)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "0.00",
+        "Extra": ""
+    }
+]

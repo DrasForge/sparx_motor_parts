@@ -1,0 +1,18 @@
+{
+    "sale": [
+        {
+            "id": 18,
+            "transaction_id": "TRX-BAB5EE45-1772718560",
+            "status": "completed"
+        }
+    ],
+    "returns": [
+        {
+            "id": 1,
+            "sale_id": 19,
+            "cashier_id": 1,
+            "total_refund": "88.24",
+            "created_at": "2026-03-05 22:22:06"
+        }
+    ]
+}
