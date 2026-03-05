@@ -47,10 +47,37 @@ class ConfigService {
     }
 
     public function deleteBranch($id) {
+        // Check for dependent users
+        $check = $this->db->prepare("SELECT COUNT(*) FROM users WHERE branch_id = :id");
+        $check->bindParam(':id', $id);
+        $check->execute();
+        if ($check->fetchColumn() > 0) {
+            throw new Exception("Cannot delete: branch still has users assigned to it. Reassign users first.");
+        }
+
+        // Check for inventory records
+        $check2 = $this->db->prepare("SELECT COUNT(*) FROM inventory WHERE branch_id = :id");
+        $check2->bindParam(':id', $id);
+        $check2->execute();
+        if ($check2->fetchColumn() > 0) {
+            throw new Exception("Cannot delete: branch has inventory records. Remove or transfer inventory first.");
+        }
+
+        // Check for sales history
+        $check3 = $this->db->prepare("SELECT COUNT(*) FROM sales WHERE branch_id = :id");
+        $check3->bindParam(':id', $id);
+        $check3->execute();
+        if ($check3->fetchColumn() > 0) {
+            throw new Exception("Cannot delete: branch has transaction history.");
+        }
+
+        // Safe to delete
         $query = "DELETE FROM branches WHERE id = :id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $id);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            throw new Exception("Database error while deleting branch.");
+        }
     }
 }
 ?>

@@ -76,6 +76,34 @@ const POS = () => {
         }
     };
 
+    const handleReprint = async (transactionId) => {
+        try {
+            const res = await axios.get(`/api/sales/get_sale.php?transaction_id=${transactionId}`);
+            const saleData = res.data;
+
+            setReceiptData({
+                transaction_id: saleData.transaction_id,
+                cashier: saleData.cashier_name,
+                branch: user.branch_name || 'Branch',
+                items: saleData.items.map(item => ({
+                    id: item.product_id,
+                    name: item.name,
+                    sku: item.sku,
+                    quantity: parseInt(item.quantity),
+                    price: parseFloat(item.price_at_sale)
+                })),
+                total: parseFloat(saleData.total_amount),
+                payment_method: saleData.payment_method,
+                amount_tendered: parseFloat(saleData.amount_tendered || saleData.total_amount),
+                change: parseFloat(saleData.amount_tendered || saleData.total_amount) - parseFloat(saleData.total_amount),
+                date: new Date(saleData.created_at)
+            });
+            setIsHistoryModalOpen(false);
+        } catch (err) {
+            alert("Failed to fetch sale details: " + (err.response?.data?.message || err.message));
+        }
+    };
+
 
     useEffect(() => {
         const checkShift = async () => {
@@ -92,6 +120,7 @@ const POS = () => {
         };
         if (user) checkShift();
     }, [user]);
+
 
     const handleStartShift = async () => {
         try {
@@ -231,6 +260,7 @@ const POS = () => {
             const payload = {
                 branch_id: user.branch_id || 1,
                 user_id: user.id,
+                shift_id: shift?.id,
                 customer_name: "Walk-in",
                 total_amount: total,
                 payment_method: paymentDetails.method,
@@ -523,14 +553,24 @@ const POS = () => {
                                                                 </span>
                                                             </td>
                                                             <td className="p-4 text-right">
-                                                                {sale.status !== 'voided' && (user.role === 'admin' || user.role === 'manager') && (
-                                                                    <button
-                                                                        onClick={() => handleVoidSale(sale.id)}
-                                                                        className="text-red-400 hover:text-red-300 text-xs uppercase font-bold border border-red-500/30 px-3 py-1 rounded hover:bg-red-900/20 transition-colors"
-                                                                    >
-                                                                        Void
-                                                                    </button>
-                                                                )}
+                                                                <div className="flex justify-end gap-2">
+                                                                    {sale.status === 'completed' && (
+                                                                        <button
+                                                                            onClick={() => handleReprint(sale.transaction_id)}
+                                                                            className="text-blue-400 hover:text-blue-300 text-xs uppercase font-bold border border-blue-500/30 px-3 py-1 rounded hover:bg-blue-900/20 transition-colors"
+                                                                        >
+                                                                            Reprint
+                                                                        </button>
+                                                                    )}
+                                                                    {sale.status !== 'voided' && (user.role === 'admin' || user.role === 'manager') && (
+                                                                        <button
+                                                                            onClick={() => handleVoidSale(sale.id)}
+                                                                            className="text-red-400 hover:text-red-300 text-xs uppercase font-bold border border-red-500/30 px-3 py-1 rounded hover:bg-red-900/20 transition-colors"
+                                                                        >
+                                                                            Void
+                                                                        </button>
+                                                                    )}
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     ))}
@@ -642,6 +682,10 @@ const POS = () => {
                                                     <span>Cash Sales:</span>
                                                     <span className="font-mono">₱{parseFloat(reconciliationStats.cash_sales).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                                 </div>
+                                                <div className="flex justify-between text-red-400">
+                                                    <span>Cash Refunds:</span>
+                                                    <span className="font-mono">-₱{parseFloat(reconciliationStats.total_refunded || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                </div>
                                                 <div className="border-t border-gray-600 my-1"></div>
                                                 <div className="flex justify-between text-white font-bold text-base">
                                                     <span>Expected In Drawer:</span>
@@ -677,8 +721,11 @@ const POS = () => {
                                         <div className="flex justify-between"><span>Shift ID:</span><span>#{shiftSummary.shift_id}</span></div>
                                         <div className="flex justify-between"><span>Cashier:</span><span>{user.username}</span></div>
                                         <div className="border-b border-black my-2"></div>
-                                        <div className="flex justify-between"><span>Txn Count:</span><span>{shiftSummary.txn_count}</span></div>
+                                        <div className="flex justify-between text-gray-600"><span>Txn Count:</span><span>{shiftSummary.txn_count}</span></div>
                                         <div className="flex justify-between font-bold"><span>Total Sales:</span><span>₱{parseFloat(shiftSummary.total_sales).toFixed(2)}</span></div>
+                                        <div className="flex justify-between text-red-600"><span>Total Refunds:</span><span>-₱{parseFloat(shiftSummary.total_refunded || 0).toFixed(2)}</span></div>
+                                        <div className="border-b border-black my-1"></div>
+                                        <div className="flex justify-between font-bold text-lg"><span>Net Cash:</span><span>₱{(parseFloat(shiftSummary.total_sales) - parseFloat(shiftSummary.total_refunded || 0)).toFixed(2)}</span></div>
                                         <div className="flex justify-between"><span>Ending Cash:</span><span>₱{parseFloat(shiftSummary.ending_cash).toFixed(2)}</span></div>
                                         <div className="text-center mt-4 text-xs">** END OF REPORT **</div>
                                     </div>

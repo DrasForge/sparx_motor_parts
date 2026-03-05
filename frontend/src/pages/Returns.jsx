@@ -13,14 +13,27 @@ const Returns = () => {
     const [totalRefundedToday, setTotalRefundedToday] = useState(0);
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
     const [recentReturns, setRecentReturns] = useState([]);
+    const [shift, setShift] = useState(null);
 
     // Initial load for today's refund total
     useEffect(() => {
         if (user?.branch_id) {
             fetchTotalRefunded();
             fetchRecentReturns();
+            checkShift();
         }
     }, [user]);
+
+    const checkShift = async () => {
+        try {
+            const res = await axios.get(`/api/shifts/check_status.php?user_id=${user.id}`);
+            if (res.data.status === 'open') {
+                setShift(res.data.data);
+            }
+        } catch (err) {
+            console.error("Failed to check shift status:", err);
+        }
+    };
 
     const fetchTotalRefunded = async () => {
         try {
@@ -141,6 +154,7 @@ const Returns = () => {
         const payload = {
             sale_id: saleData.id,
             cashier_id: user.id,
+            shift_id: shift?.id,
             total_refund: calculateTotalRefund(),
             items: itemsToReturn
         };

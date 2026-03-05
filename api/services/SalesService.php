@@ -139,11 +139,12 @@ class SalesService {
             $this->db->beginTransaction();
 
             // Insert into returns table
-            $query = "INSERT INTO returns (sale_id, cashier_id, total_refund, created_at) 
-                      VALUES (:sid, :cid, :total, NOW())";
+            $query = "INSERT INTO returns (sale_id, cashier_id, shift_id, total_refund, created_at) 
+                      VALUES (:sid, :cid, :shift, :total, NOW())";
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':sid', $data->sale_id);
             $stmt->bindParam(':cid', $data->cashier_id);
+            $stmt->bindParam(':shift', $data->shift_id);
             $stmt->bindParam(':total', $data->total_refund);
             $stmt->execute();
             $returnId = $this->db->lastInsertId();

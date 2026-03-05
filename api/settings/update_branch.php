@@ -16,8 +16,18 @@ if ($method === 'GET') {
     $configService->updateBranch($data);
     echo json_encode(["message" => "Branch updated."]);
 } elseif ($method === 'DELETE') {
-    $id = $_GET['id'];
-    $configService->deleteBranch($id);
-    echo json_encode(["message" => "Branch deleted."]);
+    try {
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            http_response_code(400);
+            echo json_encode(["message" => "Branch ID required."]);
+            exit;
+        }
+        $configService->deleteBranch($id);
+        echo json_encode(["message" => "Branch deleted."]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(["message" => "Failed to delete branch: " . $e->getMessage()]);
+    }
 }
 ?>
