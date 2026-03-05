@@ -702,69 +702,144 @@ const POS = () => {
             )}
 
             {/* Receipt Modal */}
-            {receiptData && (
-                <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white text-gray-900 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col">
-                        <div className="text-center p-6 border-b border-gray-200">
-                            <div className="flex items-center justify-center gap-2 mb-1">
-                                <CheckCircle size={28} className="text-green-500" />
-                                <span className="text-2xl font-bold text-green-600">Payment Successful!</span>
-                            </div>
-                            <p className="text-gray-500 text-sm font-mono">{receiptData.transaction_id}</p>
-                        </div>
+            {receiptData && (() => {
+                const vatRate = 0.12;
+                const vatableSales = receiptData.total / (1 + vatRate);
+                const vatAmount = receiptData.total - vatableSales;
+                const amountTendered = parseFloat(receiptData.amount_tendered || receiptData.total);
+                const change = receiptData.payment_method === 'cash' ? Math.max(0, amountTendered - receiptData.total) : 0;
 
-                        <div className="p-6 font-mono text-sm space-y-1 flex-1 overflow-y-auto">
-                            <div className="flex justify-between text-gray-500 text-xs mb-2">
-                                <span>Cashier: {receiptData.cashier}</span>
-                                <span>{receiptData.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                            </div>
-                            <div className="border-t border-dashed border-gray-300 my-2" />
-                            {receiptData.items.map((item, i) => (
-                                <div key={i} className="space-y-0.5">
-                                    <div className="font-bold text-gray-800 truncate">{item.name}</div>
-                                    <div className="flex justify-between text-gray-600">
-                                        <span>{item.quantity} x ₱{parseFloat(item.price).toFixed(2)}</span>
-                                        <span>₱{(item.quantity * parseFloat(item.price)).toFixed(2)}</span>
+                return (
+                    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
+                        <div className="flex flex-col gap-4 w-full max-w-xs my-auto">
+                            {/* The Receipt */}
+                            <div id="receipt-print-area" className="bg-white text-black font-mono text-xs leading-relaxed shadow-2xl" style={{ fontFamily: "'Courier New', Courier, monospace" }}>
+                                {/* Store Header */}
+                                <div className="text-center py-4 px-4 border-b-2 border-dashed border-gray-400">
+                                    <div className="text-lg font-bold tracking-widest">SParx</div>
+                                    <div className="text-xs font-bold tracking-wider">MOTORPARTS & ACCESSORIES</div>
+                                    <div className="text-xs text-gray-600 mt-1">{user?.branch_name || 'Main Branch'}</div>
+                                    <div className="text-xs text-gray-500">Tel: (XXX) XXX-XXXX</div>
+                                </div>
+
+                                {/* Non-BIR Disclaimer */}
+                                <div className="text-center py-2 px-4 bg-gray-100 border-b border-dashed border-gray-400">
+                                    <div className="text-xs font-bold text-gray-600 uppercase tracking-wide">⚠ NOT BIR REGISTERED ⚠</div>
+                                    <div className="text-xs text-gray-500">For Internal Monitoring Only</div>
+                                    <div className="text-xs text-gray-500">This is NOT an official receipt.</div>
+                                </div>
+
+                                {/* Transaction Info */}
+                                <div className="px-4 pt-3 pb-1 border-b border-dashed border-gray-300">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Date:</span>
+                                        <span>{receiptData.date.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Time:</span>
+                                        <span>{receiptData.date.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Cashier:</span>
+                                        <span>{receiptData.cashier}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">SI No.:</span>
+                                        <span className="text-xs">{receiptData.transaction_id}</span>
                                     </div>
                                 </div>
-                            ))}
-                            <div className="border-t border-dashed border-gray-300 my-2" />
-                            <div className="flex justify-between font-bold text-base">
-                                <span>TOTAL</span>
-                                <span>₱{receiptData.total.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between text-gray-600">
-                                <span>Payment ({receiptData.payment_method?.toUpperCase()})</span>
-                                <span>₱{parseFloat(receiptData.amount_tendered || receiptData.total).toFixed(2)}</span>
-                            </div>
-                            {receiptData.payment_method === 'cash' && (
-                                <div className="flex justify-between text-green-600 font-bold">
-                                    <span>CHANGE</span>
-                                    <span>₱{Math.max(0, receiptData.change).toFixed(2)}</span>
-                                </div>
-                            )}
-                            <div className="border-t border-dashed border-gray-300 my-2" />
-                            <div className="text-center text-xs text-gray-400 mt-2">Thank you! Please come again.</div>
-                        </div>
 
-                        <div className="p-4 border-t border-gray-200 flex gap-3">
-                            <button
-                                onClick={() => window.print()}
-                                className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl flex items-center justify-center gap-2 transition-colors"
-                            >
-                                <Printer size={18} />
-                                Print
-                            </button>
-                            <button
-                                onClick={() => setReceiptData(null)}
-                                className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors"
-                            >
-                                New Sale
-                            </button>
+                                {/* Items */}
+                                <div className="px-4 pt-2 pb-2 border-b border-dashed border-gray-300">
+                                    <div className="flex justify-between text-gray-500 text-xs mb-1 uppercase">
+                                        <span>Description</span>
+                                        <span>Amount</span>
+                                    </div>
+                                    {receiptData.items.map((item, i) => (
+                                        <div key={i} className="mb-1.5">
+                                            <div className="font-bold truncate">{item.name}</div>
+                                            <div className="flex justify-between text-gray-700">
+                                                <span>&nbsp;&nbsp;{item.quantity} pc(s) @ ₱{parseFloat(item.price).toFixed(2)}</span>
+                                                <span>₱{(item.quantity * parseFloat(item.price)).toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Totals */}
+                                <div className="px-4 py-2 border-b border-dashed border-gray-300 space-y-0.5">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">VATable Sales:</span>
+                                        <span>₱{vatableSales.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">VAT (12%):</span>
+                                        <span>₱{vatAmount.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">VAT-Exempt Sales:</span>
+                                        <span>₱0.00</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Zero-Rated Sales:</span>
+                                        <span>₱0.00</span>
+                                    </div>
+                                    <div className="border-t border-gray-300 mt-1 pt-1 flex justify-between font-bold text-sm">
+                                        <span>TOTAL DUE:</span>
+                                        <span>₱{receiptData.total.toFixed(2)}</span>
+                                    </div>
+                                </div>
+
+                                {/* Payment */}
+                                <div className="px-4 py-2 border-b border-dashed border-gray-300 space-y-0.5">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Payment ({receiptData.payment_method?.toUpperCase()}):</span>
+                                        <span>₱{amountTendered.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between font-bold">
+                                        <span>Change:</span>
+                                        <span>₱{change.toFixed(2)}</span>
+                                    </div>
+                                </div>
+
+                                {/* Footer */}
+                                <div className="text-center py-4 px-4 text-xs text-gray-500 space-y-1">
+                                    <div>Items Sold: {receiptData.items.reduce((s, i) => s + i.quantity, 0)}</div>
+                                    <div className="border-t border-dashed border-gray-300 pt-2 mt-2">
+                                        <div className="font-bold text-gray-700">Thank you for your purchase!</div>
+                                        <div>No returns after 7 days.</div>
+                                        <div>Goods once sold are not returnable</div>
+                                        <div>without original receipt.</div>
+                                    </div>
+                                    <div className="border-t border-dashed border-gray-300 pt-2 mt-2 text-gray-400">
+                                        <div>*** NOT AN OFFICIAL RECEIPT ***</div>
+                                        <div>NOT BIR REGISTERED</div>
+                                        <div>FOR INTERNAL MONITORING ONLY</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Action Buttons (outside print area) */}
+                            <div className="flex gap-3 no-print">
+                                <button
+                                    onClick={() => window.print()}
+                                    className="flex-1 py-3 bg-white hover:bg-gray-100 text-gray-800 font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow border border-gray-300"
+                                >
+                                    <Printer size={18} />
+                                    Print Receipt
+                                </button>
+                                <button
+                                    onClick={() => setReceiptData(null)}
+                                    className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors shadow"
+                                >
+                                    New Sale
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                );
+            })()}
+
         </div>
     );
 };
