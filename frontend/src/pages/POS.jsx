@@ -617,8 +617,12 @@ const POS = () => {
                                                 <td className="p-4 text-gray-300">{sale.customer_name}</td>
                                                 <td className="p-4 text-right font-bold text-white">₱{parseFloat(sale.total).toLocaleString()}</td>
                                                 <td className="p-4 text-center">
-                                                    <span className={`px-2 py-1 rounded text-xs uppercase font-bold ${sale.status === 'voided' ? 'bg-red-500/10 text-red-500' : 'bg-green-500/10 text-green-400'}`}>
-                                                        {sale.status}
+                                                    <span className={`px-2 py-1 rounded text-xs uppercase font-bold 
+                                                        ${sale.status === 'voided' ? 'bg-red-500/10 text-red-500' :
+                                                            sale.status === 'refunded' ? 'bg-blue-500/10 text-blue-400' :
+                                                                sale.status === 'partial_refund' ? 'bg-yellow-500/10 text-yellow-400' :
+                                                                    'bg-green-500/10 text-green-400'}`}>
+                                                        {sale.status.replace('_', ' ')}
                                                     </span>
                                                 </td>
                                                 <td className="p-4 text-right">

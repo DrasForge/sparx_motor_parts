@@ -13,6 +13,7 @@ const Sidebar = () => {
         { icon: Package, label: 'Inventory', path: '/inventory', roles: ['admin', 'inventory_manager'] },
         { icon: ArrowLeftRight, label: 'Logistics', path: '/logistics', roles: ['admin', 'inventory_manager'] },
         { icon: ShoppingCart, label: 'POS / Sales', path: '/pos', roles: ['admin', 'cashier'] },
+        { icon: ArrowLeftRight, label: 'Returns', path: '/returns', roles: ['admin', 'cashier'] },
         { icon: User, label: 'Users', path: '/users', roles: ['admin'] },
         { icon: Activity, label: 'Reports', path: '/reports', roles: ['admin'] },
         { icon: Settings, label: 'Settings', path: '/settings', roles: ['admin'] },

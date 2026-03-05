@@ -11,6 +11,7 @@ import Reports from './pages/Reports';
 import Users from './pages/Users';
 import Settings from './pages/Settings';
 import Error403 from './pages/Error403';
+import Returns from './pages/Returns';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/logistics" element={<Logistics />} />
               <Route path="/pos" element={<POS />} />
+              <Route path="/returns" element={<Returns />} />
               <Route path="/users" element={<Users />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<Settings />} />
@@ -33,7 +35,7 @@ function App() {
             </Route>
           </Route>
 
-          {}
+          { }
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>

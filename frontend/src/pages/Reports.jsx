@@ -6,13 +6,13 @@ import { Award, Package } from 'lucide-react';
 
 const Reports = () => {
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState('overview'); 
+    const [activeTab, setActiveTab] = useState('overview');
     const [topProducts, setTopProducts] = useState([]);
     const [transactions, setTransactions] = useState([]);
     const [auditLogs, setAuditLogs] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    
+
     const [branches, setBranches] = useState([]);
     const [selectedBranch, setSelectedBranch] = useState('');
 
@@ -68,7 +68,7 @@ const Reports = () => {
                     <p className="text-gray-400">Detailed insights into your sales performance.</p>
                 </div>
 
-                {}
+                { }
                 {user.role === 'admin' && (
                     <div className="flex items-center gap-2 bg-gray-800 p-2 rounded-lg border border-gray-700">
                         <span className="text-sm text-gray-400 px-2">Filter Branch:</span>
@@ -88,7 +88,7 @@ const Reports = () => {
                 )}
             </div>
 
-            {}
+            { }
             <div className="flex border-b border-gray-700 mb-8">
                 <button
                     onClick={() => setActiveTab('overview')}
@@ -114,7 +114,7 @@ const Reports = () => {
 
             {!loading && activeTab === 'overview' && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    {}
+                    { }
                     <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
                         <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
                             <Award className="text-yellow-500" />
@@ -137,7 +137,7 @@ const Reports = () => {
                         </div>
                     </div>
 
-                    {}
+                    { }
                     <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
                         <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
                             <Package className="text-blue-500" />
@@ -197,8 +197,12 @@ const Reports = () => {
                                         <td className="p-4 text-gray-300 capitalize">{txn.payment_method}</td>
                                         <td className="p-4 text-right font-bold text-white">₱{parseFloat(txn.total).toLocaleString()}</td>
                                         <td className="p-4 text-center">
-                                            <span className="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs uppercase font-bold">
-                                                {txn.status}
+                                            <span className={`px-2 py-1 rounded text-xs uppercase font-bold
+                                                ${txn.status === 'voided' ? 'bg-red-500/10 text-red-500' :
+                                                    txn.status === 'refunded' ? 'bg-blue-500/10 text-blue-400' :
+                                                        txn.status === 'partial_refund' ? 'bg-yellow-500/10 text-yellow-400' :
+                                                            'bg-green-500/10 text-green-400'}`}>
+                                                {txn.status.replace('_', ' ')}
                                             </span>
                                         </td>
                                     </tr>
