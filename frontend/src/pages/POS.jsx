@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
+import { Printer, CheckCircle } from 'lucide-react';
 import { Search, ShoppingCart, Trash2, Plus, Minus, CreditCard, User, LogOut, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import PaymentModal from '../components/PaymentModal';
@@ -214,6 +215,8 @@ const POS = () => {
             .catch(console.error);
     };
 
+    const [receiptData, setReceiptData] = useState(null);
+
     const removeFromCart = (id) => {
         setCart(prev => prev.filter(item => item.id !== id));
     };
@@ -224,6 +227,7 @@ const POS = () => {
 
     const handlePayment = async (paymentDetails) => {
         try {
+            const cartSnapshot = [...cart];
             const payload = {
                 branch_id: user.branch_id || 1,
                 user_id: user.id,
@@ -239,7 +243,17 @@ const POS = () => {
 
             const res = await axios.post('/api/sales/create_sale.php', payload);
 
-            alert(`Transaction Successful! ID: ${res.data.transaction_id}`);
+            setReceiptData({
+                transaction_id: res.data.transaction_id,
+                cashier: user.username,
+                branch: user.branch_name || 'Branch',
+                items: cartSnapshot,
+                total,
+                payment_method: paymentDetails.method,
+                amount_tendered: paymentDetails.amount_tendered,
+                change: paymentDetails.amount_tendered - total,
+                date: new Date()
+            });
             setCart([]);
             setIsPaymentOpen(false);
             cancelSelection();
@@ -682,6 +696,71 @@ const POS = () => {
                                     </button>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Receipt Modal */}
+            {receiptData && (
+                <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white text-gray-900 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col">
+                        <div className="text-center p-6 border-b border-gray-200">
+                            <div className="flex items-center justify-center gap-2 mb-1">
+                                <CheckCircle size={28} className="text-green-500" />
+                                <span className="text-2xl font-bold text-green-600">Payment Successful!</span>
+                            </div>
+                            <p className="text-gray-500 text-sm font-mono">{receiptData.transaction_id}</p>
+                        </div>
+
+                        <div className="p-6 font-mono text-sm space-y-1 flex-1 overflow-y-auto">
+                            <div className="flex justify-between text-gray-500 text-xs mb-2">
+                                <span>Cashier: {receiptData.cashier}</span>
+                                <span>{receiptData.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                            <div className="border-t border-dashed border-gray-300 my-2" />
+                            {receiptData.items.map((item, i) => (
+                                <div key={i} className="space-y-0.5">
+                                    <div className="font-bold text-gray-800 truncate">{item.name}</div>
+                                    <div className="flex justify-between text-gray-600">
+                                        <span>{item.quantity} x ₱{parseFloat(item.price).toFixed(2)}</span>
+                                        <span>₱{(item.quantity * parseFloat(item.price)).toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            ))}
+                            <div className="border-t border-dashed border-gray-300 my-2" />
+                            <div className="flex justify-between font-bold text-base">
+                                <span>TOTAL</span>
+                                <span>₱{receiptData.total.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-600">
+                                <span>Payment ({receiptData.payment_method?.toUpperCase()})</span>
+                                <span>₱{parseFloat(receiptData.amount_tendered || receiptData.total).toFixed(2)}</span>
+                            </div>
+                            {receiptData.payment_method === 'cash' && (
+                                <div className="flex justify-between text-green-600 font-bold">
+                                    <span>CHANGE</span>
+                                    <span>₱{Math.max(0, receiptData.change).toFixed(2)}</span>
+                                </div>
+                            )}
+                            <div className="border-t border-dashed border-gray-300 my-2" />
+                            <div className="text-center text-xs text-gray-400 mt-2">Thank you! Please come again.</div>
+                        </div>
+
+                        <div className="p-4 border-t border-gray-200 flex gap-3">
+                            <button
+                                onClick={() => window.print()}
+                                className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl flex items-center justify-center gap-2 transition-colors"
+                            >
+                                <Printer size={18} />
+                                Print
+                            </button>
+                            <button
+                                onClick={() => setReceiptData(null)}
+                                className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors"
+                            >
+                                New Sale
+                            </button>
                         </div>
                     </div>
                 </div>
