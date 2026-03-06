@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Lock, ArrowRight, Loader, Shield, Briefcase, Calculator } from 'lucide-react';
+import { User, Lock, ArrowRight, Loader, Shield, Briefcase, Calculator, Smartphone, Cpu } from 'lucide-react';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -29,146 +29,178 @@ const Login = () => {
     };
 
     const roles = [
-        { id: 'admin', label: 'Admin', icon: Shield, color: 'from-blue-600 to-blue-400' },
-        { id: 'inventory_manager', label: 'Manager', icon: Briefcase, color: 'from-emerald-600 to-emerald-400' },
-        { id: 'cashier', label: 'Cashier', icon: Calculator, color: 'from-purple-600 to-purple-400' }
+        { id: 'admin', label: 'Admin', icon: Shield, color: 'text-blue-500' },
+        { id: 'inventory_manager', label: 'Manager', icon: Briefcase, color: 'text-emerald-500' },
+        { id: 'cashier', label: 'Cashier', icon: Calculator, color: 'text-purple-500' }
     ];
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#050510] relative overflow-hidden font-sans">
-            {/* Animated Background Blobs */}
-            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse" />
-            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
-            <div className="absolute top-[30%] right-[20%] w-[30%] h-[30%] bg-purple-600/10 rounded-full blur-[100px] animate-bounce" style={{ animationDuration: '8s' }} />
+        <div className="min-h-screen flex flex-col md:flex-row bg-[#08080a] text-white selection:bg-blue-500/30 font-sans overflow-hidden">
 
-            <div className="w-full max-w-lg p-6 relative z-10">
-                <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-10 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
-                    {/* Glossy Top Shine */}
-                    <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            {/* Left Side: Cinematic Branding (60%) */}
+            <div className="hidden md:flex flex-[1.5] relative items-center justify-center p-12 overflow-hidden border-r border-white/5">
+                {/* Background Grid Pattern */}
+                <div className="absolute inset-0 opacity-[0.15]"
+                    style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1px, transparent 0)', backgroundSize: '40px 40px' }}
+                />
 
-                    <div className="text-center mb-10">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-2xl shadow-[0_0_30px_rgba(37,99,235,0.4)] mb-6 transform hover:rotate-6 transition-transform duration-500">
-                            <Calculator className="text-white" size={32} />
+                {/* Animated Glowing Orbs */}
+                <div className="absolute top-1/4 left-1/4 w-[30vw] h-[30vw] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-1/4 right-1/4 w-[20vw] h-[20vw] bg-emerald-500/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
+
+                <div className="relative z-10 w-full max-w-2xl">
+                    <div className="space-y-4 animate-reveal">
+                        <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8">
+                            <Cpu size={14} className="text-blue-400" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-100/50">System Version 4.0.1_RC</span>
                         </div>
-                        <h1 className="text-4xl font-black italic tracking-tighter bg-gradient-to-r from-white via-blue-100 to-emerald-200 bg-clip-text text-transparent">
-                            SPARX GPOS
+
+                        <h1 className="text-[120px] leading-[0.8] font-black italic tracking-tighter select-none">
+                            <span className="block text-white">SPARX</span>
+                            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-emerald-400 to-transparent opacity-80">GPOS.</span>
                         </h1>
-                        <p className="text-gray-500 mt-2 text-xs font-bold uppercase tracking-[0.3em]">Next-Gen POS Ecosystem</p>
+
+                        <p className="text-xl font-medium text-gray-500 max-w-lg pt-4 leading-relaxed">
+                            A high-fidelity <span className="text-white italic">Motor Parts Ecosystem</span>.
+                            Engineered for precision, speed, and absolute reliability.
+                        </p>
                     </div>
 
-                    {/* Premium Role Selector */}
-                    <div className="grid grid-cols-3 gap-3 p-1.5 bg-black/40 rounded-2xl mb-10 border border-white/5 relative">
+                    <div className="mt-24 grid grid-cols-3 gap-8 opacity-40 hover:opacity-100 transition-opacity duration-700">
+                        <div className="space-y-1">
+                            <div className="text-xs font-black uppercase tracking-widest text-gray-400">Security</div>
+                            <div className="text-lg font-bold">AES-256</div>
+                        </div>
+                        <div className="space-y-1">
+                            <div className="text-xs font-black uppercase tracking-widest text-gray-400">Response</div>
+                            <div className="text-lg font-bold">&lt; 12ms</div>
+                        </div>
+                        <div className="space-y-1">
+                            <div className="text-xs font-black uppercase tracking-widest text-gray-400">Uptime</div>
+                            <div className="text-lg font-bold">99.9%</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Corner Accents */}
+                <div className="absolute top-12 left-12 w-12 h-12 border-t-2 border-l-2 border-white/10" />
+                <div className="absolute bottom-12 right-12 w-12 h-12 border-b-2 border-r-2 border-white/10" />
+            </div>
+
+            {/* Right Side: Minimalist Auth Form (40%) */}
+            <div className="flex-1 flex items-center justify-center p-8 md:p-16 bg-[#0a0a0c] relative">
+                <div className="w-full max-w-sm space-y-12 animate-slide-up">
+
+                    {/* Compact Logo for Mobile */}
+                    <div className="md:hidden text-center mb-12">
+                        <h1 className="text-4xl font-black italic tracking-tighter text-blue-500">SPARX.</h1>
+                    </div>
+
+                    <div className="space-y-2">
+                        <h2 className="text-4xl font-bold tracking-tight">Sign In</h2>
+                        <p className="text-gray-500 font-medium">Please enter your specialized credentials.</p>
+                    </div>
+
+                    {/* Minimalist Role Toggle */}
+                    <div className="flex gap-1 p-1 bg-white/5 rounded-2xl border border-white/5">
                         {roles.map((r) => {
-                            const Icon = r.icon;
                             const isSelected = role === r.id;
                             return (
                                 <button
                                     key={r.id}
                                     type="button"
                                     onClick={() => setRole(r.id)}
-                                    className={`relative z-10 flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all duration-500 ${isSelected ? 'text-white' : 'text-gray-500 hover:text-gray-300'
+                                    className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isSelected ? 'bg-white text-black shadow-xl shadow-white/10' : 'text-gray-500 hover:text-gray-300'
                                         }`}
                                 >
-                                    {isSelected && (
-                                        <div className={`absolute inset-0 bg-gradient-to-br ${r.color} opacity-20 blur-sm rounded-xl transition-all duration-500`} />
-                                    )}
-                                    {isSelected && (
-                                        <div className={`absolute inset-0 bg-gradient-to-br ${r.color} rounded-xl shadow-lg transition-all duration-500`} />
-                                    )}
-                                    <Icon size={18} className="relative z-10" />
-                                    <span className="text-[10px] font-black uppercase tracking-wider relative z-10">{r.label}</span>
+                                    {r.label}
                                 </button>
                             );
                         })}
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-1.5 px-1">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Identity</label>
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-blue-400 transition-all duration-300">
-                                    <User size={18} />
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        <div className="space-y-6">
+                            <div className="group space-y-2">
+                                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 group-focus-within:text-blue-400 transition-colors">Access Identifier</label>
+                                <div className="relative border-b-2 border-white/10 group-focus-within:border-blue-500 transition-all duration-500">
+                                    <input
+                                        type="text"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        className="w-full py-3 bg-transparent outline-none text-xl font-medium placeholder-gray-800 transition-all"
+                                        placeholder="Username"
+                                        required
+                                    />
                                 </div>
-                                <input
-                                    type="text"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 bg-black/30 border border-white/10 rounded-2xl focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 outline-none text-white placeholder-gray-600 transition-all duration-300 font-medium text-lg shadow-inner"
-                                    placeholder={`${roles.find(r => r.id === role)?.label} Username`}
-                                    required
-                                />
                             </div>
-                        </div>
 
-                        <div className="space-y-1.5 px-1">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Access Key</label>
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-blue-400 transition-all duration-300">
-                                    <Lock size={18} />
+                            <div className="group space-y-2">
+                                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 group-focus-within:text-blue-400 transition-colors">Security Key</label>
+                                <div className="relative border-b-2 border-white/10 group-focus-within:border-blue-500 transition-all duration-500">
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full py-3 bg-transparent outline-none text-xl font-medium placeholder-gray-800 transition-all tracking-widest"
+                                        placeholder="Password"
+                                        required
+                                    />
                                 </div>
-                                <input
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 bg-black/30 border border-white/10 rounded-2xl focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 outline-none text-white placeholder-gray-600 transition-all duration-300 font-medium text-lg shadow-inner tracking-widest"
-                                    placeholder="••••••••"
-                                    required
-                                />
-                            </div>
-                            <div className="flex justify-end pt-1">
-                                <button type="button" className="text-[10px] text-blue-400/70 hover:text-blue-400 font-black uppercase tracking-wider transition-colors">Recover Access</button>
                             </div>
                         </div>
 
                         {error && (
-                            <div className="p-4 bg-red-600/10 border border-red-500/20 text-red-400 text-xs font-bold rounded-2xl text-center border-dashed animate-shake">
-                                {error}
+                            <div className="text-xs font-bold text-red-500 animate-shake">
+                                Error: {error}
                             </div>
                         )}
 
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="w-full relative group overflow-hidden"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-emerald-500 to-blue-600 bg-[length:200%_auto] animate-shimmer" />
-                            <div className="relative py-4 px-4 bg-blue-600 hover:bg-transparent transition-colors duration-500 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(37,99,235,0.3)] group-hover:shadow-[0_15px_40px_rgba(37,99,235,0.5)] transition-all">
-                                {isLoading ? (
-                                    <Loader className="animate-spin" size={20} />
-                                ) : (
-                                    <>
-                                        Authorize Session
-                                        <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform duration-300" />
-                                    </>
+                        <div className="pt-4 flex flex-col gap-6">
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="group relative w-full py-5 bg-white text-black rounded-full font-black uppercase tracking-[0.2em] text-sm overflow-hidden transition-all hover:pr-12 active:scale-95 disabled:opacity-50"
+                            >
+                                <span className="relative z-10 transition-all">
+                                    {isLoading ? 'Verifying...' : 'Authenticate'}
+                                </span>
+                                {!isLoading && (
+                                    <ArrowRight className="absolute right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:right-8 transition-all" size={20} />
                                 )}
-                            </div>
-                        </button>
+                            </button>
+
+                            <button type="button" className="text-[10px] text-gray-600 hover:text-white font-black uppercase tracking-widest transition-colors">
+                                Forgotten Security Credentials?
+                            </button>
+                        </div>
                     </form>
 
-                    <div className="mt-12 text-center">
-                        <p className="text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em]">
-                            Authorized Access Only • {new Date().getFullYear()} Sparx Tech
-                        </p>
+                    <div className="pt-12 flex items-center gap-6 text-gray-800">
+                        <p className="text-[10px] font-bold uppercase tracking-widest">Global Ops Node #051</p>
+                        <div className="flex-1 h-px bg-white/5" />
                     </div>
                 </div>
             </div>
 
             <style dangerouslySetInnerHTML={{
                 __html: `
-                @keyframes shimmer {
-                    to { background-position: 200% center; }
+                @keyframes reveal {
+                    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+                    to { opacity: 1; transform: translateY(0) scale(1); }
                 }
-                .animate-shimmer {
-                    animation: shimmer 3s linear infinite;
+                @keyframes slide-up {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
                 @keyframes shake {
                     0%, 100% { transform: translateX(0); }
                     25% { transform: translateX(-5px); }
                     75% { transform: translateX(5px); }
                 }
-                .animate-shake {
-                    animation: shake 0.4s ease-in-out;
-                }
+                .animate-reveal { animation: reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+                .animate-slide-up { animation: slide-up 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
+                .animate-shake { animation: shake 0.4s ease-in-out; }
             `}} />
         </div>
     );
