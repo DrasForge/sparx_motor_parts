@@ -4,6 +4,9 @@ A modern, responsive Point-of-Sale (POS) system built with React and PHP. Design
 
 ## 🚀 Key Features
 
+- **Ultra-Modern UI/UX**:
+    - **Cinematic Login**: Asymmetric split-screen layout with animated tech patterns and bold typography.
+    - **Glassmorphism Sidebar**: Premium translucent navigation with glowing active indicators and high-contrast user cards.
 - **Dynamic POS Interface**: Real-time cart management with barcode scanner integration.
 - **Thermal Receipt Printing**: Authenticated receipts mimicking Philippine POS standards (not BIR registered, for internal use).
 - **Relational Data Integrity**: ACID-compliant transactions for sales, inventory updates, and returns.
