@@ -13,6 +13,7 @@ const Users = () => {
     const [editingUser, setEditingUser] = useState(null);
     const [formData, setFormData] = useState({
         username: '',
+        full_name: '',
         password: '',
         role: 'cashier',
         branch_id: ''
@@ -73,6 +74,7 @@ const Users = () => {
         setEditingUser(user);
         setFormData({
             username: user.username,
+            full_name: user.full_name || '',
             password: '',
             role: user.role,
             branch_id: user.branch_id || ''
@@ -84,6 +86,7 @@ const Users = () => {
         setEditingUser(null);
         setFormData({
             username: '',
+            full_name: '',
             password: '',
             role: 'cashier',
             branch_id: ''
@@ -119,8 +122,11 @@ const Users = () => {
                                         <Shield size={24} />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-white text-lg">{user.username}</h3>
-                                        <span className="text-xs uppercase tracking-wider text-gray-500">{user.role.replace('_', ' ')}</span>
+                                        <h3 className="font-bold text-white text-lg">{user.full_name || user.username}</h3>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] uppercase tracking-wider text-gray-500 font-mono">@{user.username}</span>
+                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-900 text-blue-400 font-bold uppercase">{user.role.replace('_', ' ')}</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
@@ -147,6 +153,18 @@ const Users = () => {
                     <div className="bg-gray-800 border border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl">
                         <h2 className="text-xl font-bold mb-6">{editingUser ? 'Edit User' : 'Create User'}</h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-sm text-gray-400 mb-1">Full Name</label>
+                                <input
+                                    type="text"
+                                    className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
+                                    value={formData.full_name}
+                                    onChange={e => setFormData({ ...formData, full_name: e.target.value })}
+                                    placeholder="e.g. Juan Dela Cruz"
+                                    required
+                                />
+                            </div>
+
                             <div>
                                 <label className="block text-sm text-gray-400 mb-1">Username</label>
                                 <input

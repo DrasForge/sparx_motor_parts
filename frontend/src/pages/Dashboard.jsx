@@ -65,17 +65,21 @@ const Dashboard = () => {
             <div className="space-y-3">
                 <div className="flex justify-between items-center">
                     <span className="text-gray-400 text-sm">Sales:</span>
-                    <span className="text-emerald-400 font-semibold">{data.items_sold} sold today</span>
+                    <span className="text-sparx-yellow font-semibold">{data.items_sold} sold today</span>
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="text-gray-400 text-sm">Transactions:</span>
-                    <span className="text-blue-400 font-semibold">{data.transaction_count} transactions today</span>
+                    <span className="text-sparx-blue font-semibold">{data.transaction_count} transactions today</span>
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="text-gray-400 text-sm">Total Sales:</span>
                     <span className="text-white font-bold">₱ {parseFloat(data.total_sales).toLocaleString()} today</span>
                 </div>
                 <div className="flex justify-between items-center pt-2 border-t border-gray-700/50">
+                    <span className="text-gray-400 text-sm">Total Products:</span>
+                    <span className="text-white font-bold">{data.total_products} items</span>
+                </div>
+                <div className="flex justify-between items-center pt-1">
                     <span className="text-gray-400 text-sm">Low Stock Alert:</span>
                     <span className={`font-bold ${data.low_stock > 0 ? 'text-red-500 animate-pulse' : 'text-gray-500'}`}>
                         {data.low_stock}
@@ -90,8 +94,8 @@ const Dashboard = () => {
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold mb-2">
-                        Welcome back, <span className="bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">{user?.username}</span>
-                        <span className="ml-4 text-xs bg-red-500/10 text-red-500 px-2 py-1 rounded-full animate-pulse border border-red-500/20">● LIVE</span>
+                        Welcome back, <span className="bg-gradient-to-r from-sparx-yellow to-sparx-blue bg-clip-text text-transparent">{user?.username}</span>
+                        <span className="ml-4 text-xs bg-sparx-pink/10 text-sparx-pink px-2 py-1 rounded-full animate-pulse border border-sparx-pink/20">● LIVE</span>
                     </h1>
                     <p className="text-gray-400">
                         {user.role === 'admin' ? 'Overview of all branch performance.' : "Here is what's happening in your branch today."}
@@ -118,19 +122,25 @@ const Dashboard = () => {
                             icon={DollarSign}
                             label="Today's Sales"
                             value={`₱ ${parseFloat(metrics.sales_today).toLocaleString()}`}
-                            color="bg-emerald-500/10 text-emerald-500"
+                            color="bg-sparx-yellow/10 text-sparx-yellow"
                         />
                         <KPITile
                             icon={ShoppingBag}
                             label="Transaction Count"
                             value={metrics.orders_today}
-                            color="bg-blue-500/10 text-blue-500"
+                            color="bg-sparx-blue/10 text-sparx-blue"
                         />
                         <KPITile
                             icon={AlertTriangle}
                             label="Low Stock Alert"
                             value={`${metrics.low_stock} Items`}
-                            color="bg-yellow-500/10 text-yellow-500"
+                            color="bg-sparx-pink/10 text-sparx-pink"
+                        />
+                        <KPITile
+                            icon={ShoppingBag}
+                            label="Total Products"
+                            value={`${metrics.total_products} SKUs`}
+                            color="bg-sparx-gold/10 text-sparx-gold"
                         />
                     </div>
 
@@ -150,10 +160,10 @@ const Dashboard = () => {
                                         <YAxis stroke="#9CA3AF" fontSize={12} />
                                         <Tooltip
                                             contentStyle={{ backgroundColor: '#1F2937', borderColor: '#374151', color: '#fff' }}
-                                            itemStyle={{ color: '#60A5FA' }}
+                                            itemStyle={{ color: '#d4e12b' }}
                                             formatter={(value) => [`₱ ${parseFloat(value).toLocaleString()}`, 'Sales']}
                                         />
-                                        <Line type="monotone" dataKey="total" stroke="#3B82F6" strokeWidth={3} dot={{ fill: '#3B82F6' }} activeDot={{ r: 8 }} />
+                                        <Line type="monotone" dataKey="total" stroke="#d4e12b" strokeWidth={3} dot={{ fill: '#d4e12b' }} activeDot={{ r: 8 }} />
                                     </LineChart>
                                 </ResponsiveContainer>
                             </div>
@@ -165,14 +175,14 @@ const Dashboard = () => {
                                 {metrics.recent_sales.map((sale) => (
                                     <div key={sale.id} className="flex justify-between items-start pb-4 border-b border-gray-700 last:border-0 last:pb-0">
                                         <div>
-                                            <p className="text-white font-medium">{sale.customer_name}</p>
+                                            <p className="text-white font-medium">{sale.customer_name || 'Walk-in Customer'}</p>
                                             <p className="text-xs text-gray-500">
                                                 {new Date(sale.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-emerald-400 font-bold">+₱{parseFloat(sale.total_amount).toLocaleString()}</p>
-                                            <p className="text-xs text-gray-500">#{sale.id}</p>
+                                            <p className="text-emerald-400 font-bold">+₱{parseFloat(sale.total).toLocaleString()}</p>
+                                            <p className="text-xs text-gray-500">{sale.transaction_id || `#${sale.id}`}</p>
                                         </div>
                                     </div>
                                 ))}

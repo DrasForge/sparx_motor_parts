@@ -9,9 +9,10 @@ $inventoryService = new InventoryService($db);
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (!empty($data->id) && !empty($data->sku) && !empty($data->name)) {
+if (!empty($data->sku) && !empty($data->name)) {
     try {
-        $inventoryService->updateProduct($data->id, $data);
+        $userId = $data->user_id ?? 1;
+        $inventoryService->updateProduct($data->sku, $data, $userId);
         echo json_encode(["message" => "Product updated."]);
     } catch (Exception $e) {
         http_response_code(500);

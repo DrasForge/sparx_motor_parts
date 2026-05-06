@@ -9,15 +9,13 @@ $inventoryService = new InventoryService($db);
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (!empty($data->sku) && !empty($data->name) && !empty($data->price)) {
+if (!empty($data->sku) && !empty($data->branch_id) && !empty($data->adjustment_type) && isset($data->quantity)) {
     try {
-        $userId = $data->user_id ?? 1; // Fallback to 1 if not provided
-        $product_id = $inventoryService->createProduct($data, $userId);
-        http_response_code(201);
-        echo json_encode(["message" => "Product created.", "id" => $product_id]);
+        $inventoryService->adjustStock($data);
+        echo json_encode(["message" => "Inventory adjusted successfully."]);
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(["message" => "Failed to create product: " . $e->getMessage()]);
+        echo json_encode(["message" => "Failed to adjust inventory: " . $e->getMessage()]);
     }
 } else {
     http_response_code(400);

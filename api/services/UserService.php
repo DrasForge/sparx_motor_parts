@@ -14,11 +14,12 @@ class UserService {
     }
 
     public function createUser($data) {
-        $query = "INSERT INTO users (username, password_hash, role, branch_id) 
-                  VALUES (:username, :password, :role, :branch_id)";
+        $query = "INSERT INTO users (username, full_name, password_hash, role, branch_id) 
+                  VALUES (:username, :full_name, :password, :role, :branch_id)";
         $stmt = $this->db->prepare($query);
         $hashed = password_hash($data->password, PASSWORD_DEFAULT);
         $stmt->bindParam(':username', $data->username);
+        $stmt->bindParam(':full_name', $data->full_name);
         $stmt->bindParam(':password', $hashed);
         $stmt->bindParam(':role', $data->role);
         $stmt->bindParam(':branch_id', $data->branch_id);
@@ -26,7 +27,7 @@ class UserService {
     }
 
     public function updateUser($id, $data) {
-        $query = "UPDATE users SET username = :username, role = :role, branch_id = :branch_id";
+        $query = "UPDATE users SET username = :username, full_name = :full_name, role = :role, branch_id = :branch_id";
         if (!empty($data->password)) {
             $query .= ", password_hash = :password";
         }
@@ -34,6 +35,7 @@ class UserService {
         
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':username', $data->username);
+        $stmt->bindParam(':full_name', $data->full_name);
         $stmt->bindParam(':role', $data->role);
         $stmt->bindParam(':branch_id', $data->branch_id);
         $stmt->bindParam(':id', $id);

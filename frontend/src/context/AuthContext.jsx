@@ -7,14 +7,25 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('token'));
+    const [token, setToken] = useState(() => {
+        const storedToken = localStorage.getItem('token');
+        return storedToken === 'undefined' ? null : storedToken;
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        
         const storedUser = localStorage.getItem('user');
-        if (token && storedUser) {
-            setUser(JSON.parse(storedUser));
+        if (token && storedUser && storedUser !== 'undefined') {
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch (error) {
+                console.error('Failed to parse stored user:', error);
+                // Clear corrupted storage
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                setToken(null);
+                setUser(null);
+            }
         }
         setLoading(false);
     }, [token]);

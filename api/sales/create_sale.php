@@ -18,11 +18,20 @@ if (!empty($data->total_amount) && empty($data->total)) {
     $data->total = $data->total_amount;
 }
 
-// Normalize item fields: frontend sends product_id/quantity, service expects id/cart_quantity
+// Defaults for required database fields
+if (!isset($data->subtotal)) $data->subtotal = $data->total;
+if (!isset($data->tax_amount)) $data->tax_amount = 0;
+if (!isset($data->discount_amount)) $data->discount_amount = 0;
+if (!isset($data->shift_id)) $data->shift_id = null;
+
+// Normalize item fields: frontend sends product_sku, service expects sku or product_sku
 if (!empty($data->items)) {
     foreach ($data->items as $item) {
-        if (!empty($item->product_id) && empty($item->id)) {
-            $item->id = $item->product_id;
+        if (!empty($item->product_sku) && empty($item->sku)) {
+            $item->sku = $item->product_sku;
+        }
+        if (!empty($item->sku) && empty($item->product_sku)) {
+            $item->product_sku = $item->sku;
         }
         if (!empty($item->quantity) && empty($item->cart_quantity)) {
             $item->cart_quantity = $item->quantity;

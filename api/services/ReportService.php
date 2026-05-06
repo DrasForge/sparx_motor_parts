@@ -41,7 +41,7 @@ class ReportService {
         $stats = $stmt->fetch(PDO::FETCH_ASSOC);
 
         $stockQuery = "SELECT COUNT(*) as low_stock FROM products p 
-                       JOIN inventory i ON p.id = i.product_id 
+                       JOIN inventory i ON p.sku = i.product_sku 
                        WHERE i.quantity < 10";
         if ($branch_id) $stockQuery .= " AND i.branch_id = :bid";
         $stmt = $this->db->prepare($stockQuery);
@@ -57,6 +57,15 @@ class ReportService {
         $stmt->execute();
         $stats['recent_sales'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        $prodQuery = "SELECT COUNT(*) as total_products FROM inventory WHERE branch_id = :bid";
+        if (!$branch_id) {
+            $prodQuery = "SELECT COUNT(DISTINCT product_sku) as total_products FROM inventory";
+        }
+        $stmt = $this->db->prepare($prodQuery);
+        if ($branch_id) $stmt->bindParam(':bid', $branch_id);
+        $stmt->execute();
+        $stats['total_products'] = $stmt->fetch(PDO::FETCH_ASSOC)['total_products'];
+
         return $stats;
     }
 
@@ -65,7 +74,8 @@ class ReportService {
                   IFNULL(SUM(s.total), 0) as total_sales,
                   COUNT(s.id) as transaction_count,
                   IFNULL(SUM(si.quantity), 0) as items_sold,
-                  (SELECT COUNT(*) FROM inventory i WHERE i.branch_id = b.id AND i.quantity < 10) as low_stock
+                  (SELECT COUNT(*) FROM inventory i WHERE i.branch_id = b.id AND i.quantity < 10) as low_stock,
+                  (SELECT COUNT(*) FROM inventory i WHERE i.branch_id = b.id) as total_products
                   FROM branches b
                   LEFT JOIN sales s ON b.id = s.branch_id AND DATE(s.created_at) = CURDATE()
                   LEFT JOIN sale_items si ON s.id = si.sale_id
@@ -93,11 +103,11 @@ class ReportService {
     public function getTopProducts($branch_id = null) {
         $query = "SELECT p.name, p.sku, SUM(si.quantity) as sold_qty, SUM(si.subtotal) as revenue
                   FROM sale_items si
-                  JOIN products p ON si.product_id = p.id
+                  JOIN products p ON si.product_sku = p.sku
                   JOIN sales s ON si.sale_id = s.id
                   WHERE s.status = 'completed' AND s.created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
         if ($branch_id) $query .= " AND s.branch_id = :bid";
-        $query .= " GROUP BY p.id ORDER BY sold_qty DESC LIMIT 10";
+        $query .= " GROUP BY p.sku ORDER BY sold_qty DESC LIMIT 10";
         
         $stmt = $this->db->prepare($query);
         if ($branch_id) $stmt->bindParam(':bid', $branch_id);
@@ -106,7 +116,7 @@ class ReportService {
     }
 
     public function getAuditLogs() {
-        $query = "SELECT a.*, u.username 
+        $query = "SELECT a.*, u.username, u.full_name 
                   FROM audit_logs a 
                   LEFT JOIN users u ON a.user_id = u.id 
                   ORDER BY a.created_at DESC LIMIT 100";

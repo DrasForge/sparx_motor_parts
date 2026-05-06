@@ -10,21 +10,30 @@ $db = $database->getConnection();
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 $branch_id = isset($_GET['branch_id']) ? (int)$_GET['branch_id'] : 1;
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+$quick = isset($_GET['quick']) ? (int)$_GET['quick'] : 0;
 
 try {
     
-    $query = "SELECT p.id, p.sku, p.name, p.price, p.category, i.quantity 
+    $query = "SELECT p.sku, p.name, p.price, i.quantity 
               FROM products p 
-              JOIN inventory i ON p.id = i.product_id 
-              WHERE i.branch_id = :branch_id 
-              AND (p.sku LIKE :search OR p.name LIKE :search)
-              LIMIT :limit";
+              JOIN inventory i ON p.sku = i.product_sku 
+              WHERE i.branch_id = :branch_id";
+
+    if ($quick === 1) {
+        $query .= " AND p.is_quick_access = 1";
+    } else {
+        $query .= " AND (p.sku LIKE :search OR p.name LIKE :search)";
+    }
+    
+    $query .= " LIMIT :limit";
 
     $stmt = $db->prepare($query);
     
-    $searchTerm = "%{$search}%";
     $stmt->bindParam(':branch_id', $branch_id);
-    $stmt->bindParam(':search', $searchTerm);
+    if ($quick === 0) {
+        $searchTerm = "%{$search}%";
+        $stmt->bindParam(':search', $searchTerm);
+    }
     $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
     
     $stmt->execute();

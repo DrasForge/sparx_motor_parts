@@ -3,19 +3,26 @@
 @theme {
   --color-primary-50: #f0f9ff;
   --color-primary-100: #e0f2fe;
-  --color-primary-500: #0ea5e9;
-  --color-primary-600: #0284c7;
-  --color-primary-700: #0369a1;
+  --color-primary-500: #d4e12b; /* Neon Yellow from Logo */
+  --color-primary-600: #c5d220;
+  --color-primary-700: #b6c315;
+  
+  /* SparxG Motoshop Palette */
+  --color-sparx-yellow: #d4e12b;
+  --color-sparx-pink: #ff00a0;
+  --color-sparx-blue: #00b5e2;
+  --color-sparx-gold: #ffc107;
+  --color-sparx-dark: #0f1014;
 }
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: dark;
+  color: #e5e7eb;
+  background-color: #0f1014;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -27,6 +34,53 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background-color: #0f1014;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(285,67%,7%,1) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.1) 0, transparent 50%);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0f1014;
+}
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4e12b;
+}
+
+/* Modern Glassmorphism */
+.glass {
+  background: rgba(31, 41, 55, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(17, 24, 39, 0.8));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Glow Effects */
+.glow-yellow { box-shadow: 0 0 15px rgba(212, 225, 43, 0.2); }
+.glow-pink { box-shadow: 0 0 15px rgba(255, 0, 160, 0.2); }
+.glow-blue { box-shadow: 0 0 15px rgba(0, 181, 226, 0.2); }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 @media print {

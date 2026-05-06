@@ -1,4 +1,5 @@
 <?php
+include_once 'AuditService.php';
 class SalesService {
     private $db;
 
@@ -14,10 +15,11 @@ class SalesService {
                 $data->transaction_id = 'TRX-' . strtoupper(bin2hex(random_bytes(4))) . '-' . time();
             }
 
-            $query = "INSERT INTO sales (transaction_id, cashier_id, branch_id, shift_id, subtotal, tax_amount, discount_amount, total, status, created_at, payment_method) 
-                      VALUES (:tid, :cid, :bid, :sid, :sub, :tax, :disc, :total, 'completed', NOW(), :pm)";
+            $query = "INSERT INTO sales (transaction_id, customer_name, cashier_id, branch_id, shift_id, subtotal, tax_amount, discount_amount, total, status, created_at, payment_method) 
+                      VALUES (:tid, :customer, :cid, :bid, :sid, :sub, :tax, :disc, :total, 'completed', NOW(), :pm)";
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':tid', $data->transaction_id);
+            $stmt->bindParam(':customer', $data->customer_name);
             $stmt->bindParam(':cid', $data->cashier_id);
             $stmt->bindParam(':bid', $data->branch_id);
             $stmt->bindParam(':sid', $data->shift_id);
@@ -30,26 +32,30 @@ class SalesService {
             $saleId = $this->db->lastInsertId();
 
             foreach ($data->items as $item) {
-                $q2 = "INSERT INTO sale_items (sale_id, product_id, quantity, price, subtotal) 
-                       VALUES (:sid, :pid, :qty, :price, :sub)";
+                $q2 = "INSERT INTO sale_items (sale_id, product_sku, quantity, price, subtotal) 
+                       VALUES (:sid, :sku, :qty, :price, :sub)";
                 $s2 = $this->db->prepare($q2);
                 $s2->bindParam(':sid', $saleId);
-                $s2->bindParam(':pid', $item->id);
+                $s2->bindParam(':sku', $item->sku);
                 $s2->bindParam(':qty', $item->cart_quantity);
                 $s2->bindParam(':price', $item->price);
                 $s2->bindParam(':sub', $item->subtotal);
                 $s2->execute();
 
                 $q3 = "UPDATE inventory SET quantity = quantity - :qty 
-                       WHERE product_id = :pid AND branch_id = :bid";
+                       WHERE product_sku = :sku AND branch_id = :bid";
                 $s3 = $this->db->prepare($q3);
                 $s3->bindParam(':qty', $item->cart_quantity);
-                $s3->bindParam(':pid', $item->id);
+                $s3->bindParam(':sku', $item->sku);
                 $s3->bindParam(':bid', $data->branch_id);
                 $s3->execute();
             }
 
             $this->db->commit();
+            
+            $audit = new AuditService($this->db);
+            $audit->log($data->cashier_id, 'SALE_CREATE', "Created sale {$data->transaction_id} for total ₱{$data->total}");
+
             return [
                 "id" => $saleId,
                 "transaction_id" => $data->transaction_id
@@ -78,22 +84,25 @@ class SalesService {
             $updateStmt->bindParam(':id', $saleId);
             $updateStmt->execute();
 
-            $itemsQuery = "SELECT product_id, quantity FROM sale_items WHERE sale_id = :id";
+            $itemsQuery = "SELECT product_sku, quantity FROM sale_items WHERE sale_id = :id";
             $itemsStmt = $this->db->prepare($itemsQuery);
             $itemsStmt->bindParam(':id', $saleId);
             $itemsStmt->execute();
             $items = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($items as $item) {
-                $restoreQuery = "UPDATE inventory SET quantity = quantity + :qty WHERE product_id = :pid AND branch_id = :bid";
+                $restoreQuery = "UPDATE inventory SET quantity = quantity + :qty WHERE product_sku = :sku AND branch_id = :bid";
                 $restoreStmt = $this->db->prepare($restoreQuery);
                 $restoreStmt->bindParam(':qty', $item['quantity']);
-                $restoreStmt->bindParam(':pid', $item['product_id']);
+                $restoreStmt->bindParam(':sku', $item['product_sku']);
                 $restoreStmt->bindParam(':bid', $sale['branch_id']);
                 $restoreStmt->execute();
             }
 
             $this->db->commit();
+
+            $audit = new AuditService($this->db);
+            $audit->log($adminId, 'SALE_VOID', "Voided sale ID {$saleId}");
         } catch (Exception $e) {
             $this->db->rollBack();
             throw $e;
@@ -115,15 +124,15 @@ class SalesService {
         }
 
         $itemsQuery = "
-            SELECT si.product_id, si.quantity, si.price as price_at_sale, p.name, p.sku,
+            SELECT si.product_sku, si.quantity, si.price as price_at_sale, p.name, p.sku,
             COALESCE((
                 SELECT SUM(ri.quantity) 
                 FROM return_items ri 
                 JOIN returns r ON ri.return_id = r.id 
-                WHERE ri.product_id = si.product_id AND r.sale_id = si.sale_id
+                WHERE ri.product_sku = si.product_sku AND r.sale_id = si.sale_id
             ), 0) as returned_qty
             FROM sale_items si
-            JOIN products p ON si.product_id = p.id
+            JOIN products p ON si.product_sku = p.sku
             WHERE si.sale_id = :sid
         ";
         $itemsStmt = $this->db->prepare($itemsQuery);
@@ -155,11 +164,11 @@ class SalesService {
 
             foreach ($data->items as $item) {
                 // Insert into return_items
-                $q2 = "INSERT INTO return_items (return_id, product_id, quantity, refund_amount, condition_status) 
-                       VALUES (:rid, :pid, :qty, :amount, :cond)";
+                $q2 = "INSERT INTO return_items (return_id, product_sku, quantity, refund_amount, condition_status) 
+                       VALUES (:rid, :sku, :qty, :amount, :cond)";
                 $s2 = $this->db->prepare($q2);
                 $s2->bindParam(':rid', $returnId);
-                $s2->bindParam(':pid', $item->product_id);
+                $s2->bindParam(':sku', $item->product_sku);
                 $s2->bindParam(':qty', $item->quantity);
                 $s2->bindParam(':amount', $item->refund_amount);
                 $s2->bindParam(':cond', $item->condition_status);
@@ -168,10 +177,10 @@ class SalesService {
                 // If condition is 'good', restock inventory
                 if ($item->condition_status === 'good') {
                     $q3 = "UPDATE inventory SET quantity = quantity + :qty 
-                           WHERE product_id = :pid AND branch_id = :bid";
+                           WHERE product_sku = :sku AND branch_id = :bid";
                     $s3 = $this->db->prepare($q3);
                     $s3->bindParam(':qty', $item->quantity);
-                    $s3->bindParam(':pid', $item->product_id);
+                    $s3->bindParam(':sku', $item->product_sku);
                     $s3->bindParam(':bid', $item->branch_id);
                     $s3->execute();
                 }
@@ -206,6 +215,10 @@ class SalesService {
             $updateSaleStatusStmt->execute();
 
             $this->db->commit();
+
+            $audit = new AuditService($this->db);
+            $audit->log($data->cashier_id, 'SALE_RETURN', "Processed return for sale ID {$data->sale_id}, total refund ₱{$data->total_refund}");
+
             return ["id" => $returnId, "message" => "Return processed successfully"];
         } catch (Exception $e) {
             $this->db->rollBack();

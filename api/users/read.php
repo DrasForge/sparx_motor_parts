@@ -8,7 +8,7 @@ $database = new Database();
 $db = $database->getConnection();
 
 try {
-    $query = "SELECT u.id, u.username, u.role, u.branch_id, b.name as branch_name 
+    $query = "SELECT u.id, u.username, u.full_name, u.role, u.branch_id, b.name as branch_name 
               FROM users u 
               LEFT JOIN branches b ON u.branch_id = b.id 
               ORDER BY u.id DESC";

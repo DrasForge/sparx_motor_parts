@@ -45,8 +45,9 @@ const Login = () => {
                 />
 
                 {/* Animated Glowing Orbs */}
-                <div className="absolute top-1/4 left-1/4 w-[30vw] h-[30vw] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-1/4 right-1/4 w-[20vw] h-[20vw] bg-emerald-500/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
+                <div className="absolute top-1/4 left-1/4 w-[30vw] h-[30vw] bg-sparx-yellow/10 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-1/4 right-1/4 w-[20vw] h-[20vw] bg-sparx-pink/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
+                <div className="absolute top-1/2 right-1/3 w-[15vw] h-[15vw] bg-sparx-blue/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '4s' }} />
 
                 <div className="relative z-10 w-full max-w-2xl">
                     <div className="space-y-4 animate-reveal">
@@ -55,10 +56,14 @@ const Login = () => {
                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-100/50">System Version 4.0.1_RC</span>
                         </div>
 
-                        <h1 className="text-[120px] leading-[0.8] font-black italic tracking-tighter select-none">
-                            <span className="block text-white">SPARX</span>
-                            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-emerald-400 to-transparent opacity-80">GPOS.</span>
-                        </h1>
+                        <div className="relative group">
+                            <div className="absolute -inset-4 bg-gradient-to-r from-sparx-yellow via-sparx-pink to-sparx-blue rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+                            <img 
+                                src="/logo.png" 
+                                alt="SparxG Motoshop" 
+                                className="relative w-full max-w-lg object-contain drop-shadow-[0_0_30px_rgba(212,225,43,0.3)]"
+                            />
+                        </div>
 
                         <p className="text-xl font-medium text-gray-500 max-w-lg pt-4 leading-relaxed">
                             A high-fidelity <span className="text-white italic">Motor Parts Ecosystem</span>.
@@ -93,7 +98,7 @@ const Login = () => {
 
                     {/* Compact Logo for Mobile */}
                     <div className="md:hidden text-center mb-12">
-                        <h1 className="text-4xl font-black italic tracking-tighter text-blue-500">SPARX.</h1>
+                        <img src="/logo.png" alt="SparxG" className="w-48 mx-auto" />
                     </div>
 
                     <div className="space-y-2">
@@ -160,7 +165,7 @@ const Login = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="group relative w-full py-5 bg-white text-black rounded-full font-black uppercase tracking-[0.2em] text-sm overflow-hidden transition-all hover:pr-12 active:scale-95 disabled:opacity-50"
+                                className="group relative w-full py-5 bg-sparx-yellow text-black rounded-full font-black uppercase tracking-[0.2em] text-sm overflow-hidden transition-all hover:pr-12 active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(212,225,43,0.3)]"
                             >
                                 <span className="relative z-10 transition-all">
                                     {isLoading ? 'Verifying...' : 'Authenticate'}

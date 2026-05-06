@@ -11,6 +11,10 @@ const Reports = () => {
     const [transactions, setTransactions] = useState([]);
     const [auditLogs, setAuditLogs] = useState([]);
     const [loading, setLoading] = useState(false);
+    
+    // Date Filters
+    const [startDate, setStartDate] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
 
 
     const [branches, setBranches] = useState([]);
@@ -24,7 +28,7 @@ const Reports = () => {
         if (activeTab === 'overview') fetchTopProducts();
         if (activeTab === 'transactions') fetchTransactions();
         if (activeTab === 'audit') fetchAuditLogs();
-    }, [activeTab, selectedBranch]);
+    }, [activeTab, selectedBranch, startDate, endDate]);
 
     const fetchBranches = async () => {
         try {
@@ -45,7 +49,7 @@ const Reports = () => {
     const fetchTransactions = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`/api/reports/transactions.php?branch_id=${selectedBranch}`);
+            const res = await axios.get(`/api/reports/transactions.php?branch_id=${selectedBranch}&start_date=${startDate}&end_date=${endDate}`);
             setTransactions(res.data);
         } catch (err) { console.error(err); }
         finally { setLoading(false); }
@@ -171,8 +175,36 @@ const Reports = () => {
             )}
 
             {!loading && activeTab === 'transactions' && (
-                <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-                    <div className="overflow-x-auto">
+                <div className="space-y-4">
+                    <div className="flex flex-wrap gap-4 items-end bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-lg">
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Start Date</label>
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="bg-gray-900 border border-gray-600 text-white text-sm rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 block w-full"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">End Date</label>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="bg-gray-900 border border-gray-600 text-white text-sm rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 block w-full"
+                            />
+                        </div>
+                        <button 
+                            onClick={fetchTransactions}
+                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-all"
+                        >
+                            Apply Range
+                        </button>
+                    </div>
+
+                    <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-xl">
+                        <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="bg-gray-900/50 text-gray-400 text-xs uppercase">
                                 <tr>
@@ -216,6 +248,7 @@ const Reports = () => {
                         </table>
                     </div>
                 </div>
+            </div>
             )}
 
             {!loading && activeTab === 'audit' && (
@@ -233,7 +266,10 @@ const Reports = () => {
                         <tbody className="divide-y divide-gray-700 text-sm">
                             {auditLogs.map((log, i) => (
                                 <tr key={i} className="hover:bg-gray-700/30">
-                                    <td className="p-4 font-bold text-white">{log.username || `User #${log.user_id}`}</td>
+                                    <td className="p-4">
+                                        <div className="font-bold text-white">{log.full_name || log.username}</div>
+                                        <div className="text-[10px] text-gray-500 font-mono">@{log.username}</div>
+                                    </td>
                                     <td className="p-4 text-blue-400">{log.action}</td>
                                     <td className="p-4 text-gray-300">{log.details || '-'}</td>
                                     <td className="p-4 text-gray-500 font-mono text-xs">{log.ip_address}</td>

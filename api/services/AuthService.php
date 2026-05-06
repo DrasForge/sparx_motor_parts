@@ -7,7 +7,10 @@ class AuthService {
     }
 
     public function login($username, $password) {
-        $query = "SELECT * FROM users WHERE username = :username LIMIT 1";
+        $query = "SELECT u.*, b.name as branch_name 
+                  FROM users u 
+                  LEFT JOIN branches b ON u.branch_id = b.id 
+                  WHERE u.username = :username LIMIT 1";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':username', $username);
         $stmt->execute();

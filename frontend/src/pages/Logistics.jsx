@@ -8,21 +8,27 @@ const Logistics = () => {
     const [transfers, setTransfers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [filter, setFilter] = useState('all'); 
 
-    
     const [branches, setBranches] = useState([]);
     const [selectedBranchId, setSelectedBranchId] = useState(user?.branch_id || 1);
 
-    
     useEffect(() => {
-        if (user.role === 'admin') {
+        if (!authLoading && user?.role === 'admin') {
             axios.get('/api/settings/update_branch.php')
                 .then(res => setBranches(res.data))
                 .catch(err => console.error(err));
         }
-    }, [user]);
+    }, [user, authLoading]);
+
+    if (authLoading || !user) {
+        return (
+            <div className="h-screen flex items-center justify-center bg-[#0F1014] text-white">
+                <Loader className="animate-spin text-blue-500" size={40} />
+            </div>
+        );
+    }
 
     const fetchTransfers = async () => {
         setLoading(true);
@@ -31,7 +37,7 @@ const Logistics = () => {
             const branchId = user.role === 'admin' ? selectedBranchId : (user?.branch_id || '');
 
             const res = await axios.get(`/api/logistics/read_transfers.php?branch_id=${branchId}&role=${user.role}`);
-            setTransfers(res.data);
+            setTransfers(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
             console.error(err);
         } finally {
@@ -59,17 +65,19 @@ const Logistics = () => {
     const StatusBadge = ({ status }) => {
         const styles = {
             pending: 'bg-yellow-500/10 text-yellow-500',
-            approved: 'bg-emerald-500/10 text-emerald-500',
+            approved: 'bg-blue-500/10 text-blue-500',
+            completed: 'bg-emerald-500/10 text-emerald-500',
             rejected: 'bg-red-500/10 text-red-500'
         };
         const icons = {
             pending: <Clock size={14} />,
             approved: <CheckCircle size={14} />,
+            completed: <CheckCircle size={14} />,
             rejected: <XCircle size={14} />
         };
         return (
-            <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${styles[status]}`}>
-                {icons[status]} {status.charAt(0).toUpperCase() + status.slice(1)}
+            <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${styles[status] || 'bg-gray-500/10 text-gray-500'}`}>
+                {icons[status]} {status ? (status.charAt(0).toUpperCase() + status.slice(1)) : 'Unknown'}
             </span>
         );
     };

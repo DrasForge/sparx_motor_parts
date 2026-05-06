@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SparxG Motoshop | Tagum City</title>
+    <meta name="description" content="SparxG Motoshop, Tagum City. Premium motorcar parts, accessories, and gear. Entrust your works to the LORD and your plans will SUCCEED. Proverbs 16:3">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN for simple landing page) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        neon: {
+                            pink: '#FF007F',
+                            yellow: '#FFEA00',
+                            blue: '#00F0FF',
+                            black: '#0A0A0A',
+                            dark: '#121212'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-neon-black text-white font-sans overflow-x-hidden selection:bg-neon-pink selection:text-white">
+
+    <!-- Background Orbs -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-nav transition-all duration-300 py-4 px-6 md:px-12" id="navbar">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" class="flex items-center gap-3 group">
+                <img src="logo.png" alt="SparxG Logo" class="h-10 md:h-12 w-auto transition-transform duration-300 group-hover:scale-105">
+                <span class="text-xl md:text-2xl font-bold tracking-wider hidden sm:block">SPARXG</span>
+            </a>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center gap-8 font-medium">
+                <a href="#about" class="hover:text-neon-yellow transition-colors">About</a>
+                <a href="#gear" class="hover:text-neon-blue transition-colors">Gear & Parts</a>
+                <a href="#contact" class="hover:text-neon-pink transition-colors">Contact</a>
+                <a href="/admin_backend/" class="px-6 py-2 rounded-full border border-white/20 hover:border-neon-yellow hover:bg-neon-yellow/10 transition-all shadow-[0_0_15px_rgba(255,234,0,0)] hover:shadow-[0_0_15px_rgba(255,234,0,0.3)]">Portal</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-2xl text-white" id="mobile-menu-btn">
+                <i class="ri-menu-3-line"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="md:hidden absolute top-full left-0 w-full glass-panel flex-col items-center py-6 gap-6 hidden origin-top" id="mobile-menu">
+            <a href="#about" class="text-lg hover:text-neon-yellow transition-colors mobile-link">About</a>
+            <a href="#gear" class="text-lg hover:text-neon-blue transition-colors mobile-link">Gear & Parts</a>
+            <a href="#contact" class="text-lg hover:text-neon-pink transition-colors mobile-link">Contact</a>
+            <a href="/admin_backend/" class="text-lg text-neon-yellow border border-neon-yellow px-6 py-2 rounded-full mobile-link">Staff Portal</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden parallax-bg">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-neon-black/50 to-neon-black z-0"></div>
+        
+        <div class="max-w-4xl mx-auto text-center z-10 reveal">
+            <div class="inline-block mb-4 px-4 py-1 rounded-full border border-neon-blue/30 bg-neon-blue/10 backdrop-blur-sm text-neon-blue text-sm font-semibold tracking-widest uppercase">
+                Tagum City's Finest
+            </div>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold mb-6 leading-tight">
+                IGNITE <br class="md:hidden"/> YOUR <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink via-neon-yellow to-neon-blue animate-gradient">RIDE</span>
+            </h1>
+            <p class="text-lg md:text-2xl text-gray-300 mb-10 max-w-2xl mx-auto font-light">
+                Premium motorcar parts, accessories, and gear tailored for the modern rider.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#gear" class="w-full sm:w-auto px-8 py-4 bg-neon-pink text-white rounded-full font-bold tracking-wide transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,0,127,0.6)] hover:-translate-y-1">
+                    Explore Gear
+                </a>
+                <a href="https://www.facebook.com/ymmotorcarparts" target="_blank" class="w-full sm:w-auto px-8 py-4 bg-transparent border border-white/30 text-white rounded-full font-bold tracking-wide transition-all duration-300 hover:border-neon-blue hover:text-neon-blue hover:bg-neon-blue/10 hover:shadow-[0_0_20px_rgba(0,240,255,0.3)]">
+                    <i class="ri-facebook-circle-fill mr-2"></i> Follow Us
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Proverbs / About Section -->
+    <section id="about" class="py-24 px-6 bg-neon-black relative border-t border-white/5">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="reveal reveal-left">
+                <h2 class="text-3xl md:text-5xl font-bold mb-6">Built on <span class="text-neon-yellow">Faith</span> & <span class="text-neon-blue">Passion</span></h2>
+                <p class="text-gray-400 text-lg leading-relaxed mb-8">
+                    Located in the heart of Tagum City, SparxG Motoshop is your premier destination for high-quality motorcycle parts and accessories. We believe in providing our community with top-tier gear, expert advice, and uncompromising quality.
+                </p>
+                <div class="glass-panel p-8 rounded-2xl border-l-4 border-neon-pink relative overflow-hidden">
+                    <div class="absolute -top-6 -right-6 text-9xl text-neon-pink/10 font-serif">"</div>
+                    <p class="text-xl md:text-2xl font-light italic leading-relaxed text-gray-200">
+                        Entrust your works to the LORD and your plans will SUCCEED.
+                    </p>
+                    <p class="mt-4 font-bold text-neon-pink tracking-widest uppercase text-sm">- Proverbs 16:3</p>
+                </div>
+            </div>
+            
+            <div class="relative reveal reveal-right h-[400px] md:h-[500px] w-full rounded-2xl overflow-hidden border border-white/10 group">
+                <div class="absolute inset-0 bg-gradient-to-tr from-neon-blue/20 to-neon-pink/20 mix-blend-overlay z-10 transition-opacity duration-500 group-hover:opacity-0"></div>
+                <!-- Abstract neon placeholder image since we don't have a real shop photo here -->
+                <img src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Motorcycle" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105">
+                <div class="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-neon-black to-transparent z-20">
+                    <h3 class="text-2xl font-bold text-white">Tagum City</h3>
+                    <p class="text-neon-yellow">Main Branch</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gear & Parts Section -->
+    <section id="gear" class="py-24 px-6 relative border-t border-white/5">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Premium <span class="text-neon-blue">Arsenal</span></h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">Everything you need to upgrade, maintain, and personalize your ride.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="glass-card rounded-2xl p-8 reveal group hover:-translate-y-2 transition-all duration-300 border-t-2 border-transparent hover:border-neon-pink">
+                    <div class="w-16 h-16 rounded-full bg-neon-pink/10 flex items-center justify-center text-3xl text-neon-pink mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(255,0,127,0)] group-hover:shadow-[0_0_20px_rgba(255,0,127,0.4)]">
+                        <i class="ri-tools-fill"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Performance Parts</h3>
+                    <p class="text-gray-400 leading-relaxed">High-grade engine components, exhausts, and performance upgrades to push your limits.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-card rounded-2xl p-8 reveal group hover:-translate-y-2 transition-all duration-300 border-t-2 border-transparent hover:border-neon-yellow" style="transition-delay: 100ms;">
+                    <div class="w-16 h-16 rounded-full bg-neon-yellow/10 flex items-center justify-center text-3xl text-neon-yellow mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(255,234,0,0)] group-hover:shadow-[0_0_20px_rgba(255,234,0,0.4)]">
+                        <i class="ri-dashboard-3-fill"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Accessories</h3>
+                    <p class="text-gray-400 leading-relaxed">Customize your look with premium aesthetic upgrades, lighting, and custom decals.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-card rounded-2xl p-8 reveal group hover:-translate-y-2 transition-all duration-300 border-t-2 border-transparent hover:border-neon-blue" style="transition-delay: 200ms;">
+                    <div class="w-16 h-16 rounded-full bg-neon-blue/10 flex items-center justify-center text-3xl text-neon-blue mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(0,240,255,0)] group-hover:shadow-[0_0_20px_rgba(0,240,255,0.4)]">
+                        <i class="ri-shield-user-fill"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Riding Gear</h3>
+                    <p class="text-gray-400 leading-relaxed">Safety first. Helmets, jackets, gloves, and protective wear that doesn't compromise on style.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA & Contact Section -->
+    <section id="contact" class="py-24 px-6 relative">
+        <div class="absolute inset-0 bg-gradient-to-b from-neon-black to-[#050505] -z-10"></div>
+        <div class="max-w-4xl mx-auto glass-panel rounded-3xl p-8 md:p-16 text-center reveal border border-white/10 relative overflow-hidden">
+            <!-- Glow behind panel -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-neon-pink/5 blur-[100px] -z-10"></div>
+            
+            <h2 class="text-3xl md:text-5xl font-bold mb-6">Ready to <span class="text-neon-pink">Upgrade?</span></h2>
+            <p class="text-xl text-gray-300 mb-10">Visit us in Tagum City or message our Facebook page for inquiries and parts availability.</p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <a href="https://www.facebook.com/ymmotorcarparts" target="_blank" class="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 bg-[#1877F2] text-white rounded-full font-bold tracking-wide transition-all duration-300 hover:bg-[#1877F2]/90 hover:shadow-[0_0_25px_rgba(24,119,242,0.5)] hover:-translate-y-1">
+                    <i class="ri-facebook-circle-fill text-2xl"></i> Message Us
+                </a>
+                <a href="#" class="w-full sm:w-auto px-8 py-4 bg-transparent border border-white/20 text-white rounded-full font-bold tracking-wide transition-all duration-300 hover:border-white hover:bg-white/5">
+                    <i class="ri-map-pin-fill mr-2"></i> Get Directions
+                </a>
+            </div>
+            
+            <div class="mt-12 pt-8 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-neon-yellow shrink-0">
+                        <i class="ri-map-pin-line text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-1">Location</h4>
+                        <p class="text-gray-400">Tagum City, Davao del Norte<br>Philippines</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-neon-blue shrink-0">
+                        <i class="ri-time-line text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-1">Business Hours</h4>
+                        <p class="text-gray-400">Mon - Sat: 8:00 AM - 6:00 PM<br>Sunday: Closed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#020202] py-12 px-6 border-t border-white/5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-3">
+                <img src="logo.png" alt="SparxG Logo" class="h-8 w-auto grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+                <span class="text-xl font-bold tracking-wider text-gray-500">SPARXG</span>
+            </div>
+            
+            <p class="text-gray-600 text-sm text-center md:text-left">
+                &copy; <span id="year"></span> SparxG Motoshop. All rights reserved.
+            </p>
+            
+            <div class="flex items-center gap-4 text-gray-600">
+                <a href="https://www.facebook.com/ymmotorcarparts" target="_blank" class="hover:text-[#1877F2] transition-colors"><i class="ri-facebook-circle-fill text-xl"></i></a>
+                <a href="/admin_backend/" class="hover:text-neon-yellow transition-colors"><i class="ri-admin-fill text-xl"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
