@@ -85,7 +85,7 @@ body {
 
 @media print {
   @page {
-    size: 80mm auto;
+    size: auto;
     margin: 0;
   }
 
@@ -94,7 +94,9 @@ body {
   }
 
   #receipt-print-area,
-  #receipt-print-area * {
+  #receipt-print-area *,
+  #shift-report-print-area,
+  #shift-report-print-area * {
     visibility: visible;
   }
 
@@ -103,6 +105,14 @@ body {
     top: 0;
     left: 0;
     width: 80mm;
+    box-shadow: none !important;
+  }
+
+  #shift-report-print-area {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 190mm;
     box-shadow: none !important;
   }
 

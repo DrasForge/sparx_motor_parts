@@ -14,8 +14,9 @@ if ($data && !empty($data->id)) {
         $logisticsService->updateTransfer($data->id, $data->status, $approvedBy);
         echo json_encode(["message" => "Transfer updated."]);
     } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(["message" => "Update failed."]);
+        $code = $e->getMessage() === "Only admin users can approve or reject transfer requests." ? 403 : 500;
+        http_response_code($code);
+        echo json_encode(["message" => $e->getMessage()]);
     }
 }
 ?>

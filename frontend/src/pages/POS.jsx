@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Printer, CheckCircle } from 'lucide-react';
-import { Search, ShoppingCart, Trash2, Plus, Minus, CreditCard, User, LogOut, ArrowLeft, Activity } from 'lucide-react';
+import { Search, ShoppingCart, Trash2, Plus, Minus, CreditCard, User, LogOut, ArrowLeft, Activity, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import PaymentModal from '../components/PaymentModal';
 import BarcodeScanner from '../components/BarcodeScanner';
@@ -48,20 +48,28 @@ const POS = () => {
     const searchRef = useRef(null);
 
 
-    useEffect(() => {
-        if (isHistoryModalOpen) {
-            fetchRecentSales();
-        }
-    }, [isHistoryModalOpen]);
+    const getLocalDateString = () => {
+        const now = new Date();
+        const offsetDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+        return offsetDate.toISOString().split('T')[0];
+    };
 
-    const fetchRecentSales = async () => {
+    const fetchRecentSales = useCallback(async () => {
+        if (!user) return;
+
         try {
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalDateString();
             const res = await axios.get(`/api/reports/transactions.php?branch_id=${user.branch_id || 1}&start_date=${today}&end_date=${today}`);
-            setRecentSales(res.data);
+            setRecentSales(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
             console.error(err);
+            setRecentSales([]);
         }
+    }, [user]);
+
+    const openSalesHistory = () => {
+        setIsHistoryModalOpen(true);
+        fetchRecentSales();
     };
 
     const handleVoidSale = async (saleId) => {
@@ -140,11 +148,33 @@ const POS = () => {
     };
 
     const handleEndShift = async () => {
+        const countedCash = parseFloat(endingCash) || 0;
+        let expectedCash = reconciliationStats ? parseFloat(reconciliationStats.expected_cash) : null;
+
+        if (expectedCash === null && shift?.id) {
+            try {
+                const statsRes = await axios.get(`/api/shifts/get_shift_stats.php?shift_id=${shift.id}`);
+                setReconciliationStats(statsRes.data);
+                expectedCash = parseFloat(statsRes.data.expected_cash);
+            } catch (err) {
+                console.error("Failed to fetch shift stats before ending shift", err);
+            }
+        }
+
+        if (expectedCash !== null && countedCash < expectedCash) {
+            const shortage = expectedCash - countedCash;
+            const shouldContinue = window.confirm(
+                `The entered ending cash is short by ₱${shortage.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}. Are you sure you want to continue with a short amount?`
+            );
+
+            if (!shouldContinue) return;
+        }
+
         try {
             const res = await axios.post('/api/shifts/end_shift.php', {
                 shift_id: shift.id,
                 user_id: user.id,
-                ending_cash: parseFloat(endingCash) || 0
+                ending_cash: countedCash
             });
             setShiftSummary(res.data.data);
             setShift(null);
@@ -496,7 +526,7 @@ const POS = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {cart.map((item, idx) => (
+                                {cart.map((item) => (
                                     <tr key={item.sku} className="border-b hover:bg-blue-50 transition-colors group">
                                         <td className="p-2 md:p-3 border-r font-medium text-gray-800 text-xs md:text-sm">
                                             <div className="flex flex-col">
@@ -529,7 +559,7 @@ const POS = () => {
                     <div className="order-2 md:order-1 md:col-span-5 space-y-3">
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                             <button
-                                onClick={() => setIsHistoryModalOpen(true)}
+                                onClick={openSalesHistory}
                                 className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2.5 px-1 rounded-lg border border-gray-600 shadow text-[10px] md:text-xs uppercase"
                             >
                                 History

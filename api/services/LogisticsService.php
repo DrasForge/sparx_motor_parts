@@ -49,6 +49,16 @@ class LogisticsService {
         try {
             $this->db->beginTransaction();
 
+            $userQuery = "SELECT role FROM users WHERE id = :uid";
+            $userStmt = $this->db->prepare($userQuery);
+            $userStmt->bindParam(':uid', $approvedBy);
+            $userStmt->execute();
+            $role = $userStmt->fetchColumn();
+
+            if ($role !== 'admin') {
+                throw new Exception("Only admin users can approve or reject transfer requests.");
+            }
+
             $query = "SELECT * FROM transfers WHERE id = :id FOR UPDATE";
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':id', $id);

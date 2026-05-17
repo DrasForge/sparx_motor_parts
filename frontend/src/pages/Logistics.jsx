@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeftRight, CheckCircle, XCircle, Clock, Plus, Loader } from 'lucide-react';
@@ -22,15 +22,9 @@ const Logistics = () => {
         }
     }, [user, authLoading]);
 
-    if (authLoading || !user) {
-        return (
-            <div className="h-screen flex items-center justify-center bg-[#0F1014] text-white">
-                <Loader className="animate-spin text-blue-500" size={40} />
-            </div>
-        );
-    }
+    const fetchTransfers = useCallback(async () => {
+        if (!user) return;
 
-    const fetchTransfers = async () => {
         setLoading(true);
         try {
             
@@ -43,11 +37,19 @@ const Logistics = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user, selectedBranchId]);
 
     useEffect(() => {
         fetchTransfers();
-    }, [user, selectedBranchId]);
+    }, [fetchTransfers]);
+
+    if (authLoading || !user) {
+        return (
+            <div className="h-screen flex items-center justify-center bg-[#0F1014] text-white">
+                <Loader className="animate-spin text-blue-500" size={40} />
+            </div>
+        );
+    }
 
     const handleApproval = async (id, status) => {
         try {
@@ -164,7 +166,7 @@ const Logistics = () => {
                                     <td className="p-4"><StatusBadge status={t.status} /></td>
                                     <td className="p-4 text-sm text-gray-400">{t.requested_by_name}</td>
                                     <td className="p-4 text-right flex justify-end gap-2">
-                                        {t.status === 'pending' && (user.role === 'admin' || user.role === 'inventory_manager') && (
+                                        {t.status === 'pending' && user.role === 'admin' && (
                                             <>
                                                 <button
                                                     onClick={() => handleApproval(t.id, 'approved')}

@@ -99,8 +99,138 @@ class ShiftService {
             "cash_sales" => $cashSales,
             "total_refunded" => $totalRefunded,
             "expected_cash" => $start + $cashSales - $totalRefunded,
-            "total_sales" => (float)($sales['total_sales_all'] ?? 0), 
+            "total_sales" => (float)($sales['total_sales_all'] ?? 0),
             "txn_count" => $sales['txn_count'] ?? 0
+        ];
+    }
+
+    public function getShifts($status = null, $branchId = null, $start = null, $end = null) {
+        $query = "SELECT
+                    sh.*,
+                    u.username as cashier_name,
+                    b.name as branch_name,
+                    TIMESTAMPDIFF(MINUTE, sh.start_time, COALESCE(sh.end_time, NOW())) as duration_minutes,
+                    COALESCE(s.cash_sales, 0) as cash_sales,
+                    COALESCE(s.gcash_sales, 0) as gcash_sales,
+                    COALESCE(s.total_sales, 0) as total_sales_calculated,
+                    COALESCE(s.txn_count, 0) as txn_count,
+                    COALESCE(si.items_sold, 0) as items_sold,
+                    COALESCE(r.total_refunded, 0) as total_refunded,
+                    (sh.starting_cash + COALESCE(s.cash_sales, 0) - COALESCE(r.total_refunded, 0)) as expected_cash,
+                    CASE
+                        WHEN sh.status = 'closed' THEN sh.ending_cash - (sh.starting_cash + COALESCE(s.cash_sales, 0) - COALESCE(r.total_refunded, 0))
+                        ELSE NULL
+                    END as difference
+                  FROM shifts sh
+                  JOIN users u ON sh.user_id = u.id
+                  JOIN branches b ON sh.branch_id = b.id
+                  LEFT JOIN (
+                    SELECT
+                        shift_id,
+                        SUM(CASE WHEN payment_method = 'cash' THEN total ELSE 0 END) as cash_sales,
+                        SUM(CASE WHEN payment_method = 'gcash' THEN total ELSE 0 END) as gcash_sales,
+                        SUM(total) as total_sales,
+                        COUNT(*) as txn_count
+                    FROM sales
+                    WHERE status IN ('completed', 'refunded', 'partial_refund')
+                    GROUP BY shift_id
+                  ) s ON sh.id = s.shift_id
+                  LEFT JOIN (
+                    SELECT s.shift_id, SUM(si.quantity) as items_sold
+                    FROM sales s
+                    JOIN sale_items si ON s.id = si.sale_id
+                    WHERE s.status IN ('completed', 'refunded', 'partial_refund')
+                    GROUP BY s.shift_id
+                  ) si ON sh.id = si.shift_id
+                  LEFT JOIN (
+                    SELECT shift_id, SUM(total_refund) as total_refunded
+                    FROM returns
+                    GROUP BY shift_id
+                  ) r ON sh.id = r.shift_id
+                  WHERE 1 = 1";
+
+        if ($status) {
+            $query .= " AND sh.status = :status";
+        }
+        if ($branchId) {
+            $query .= " AND sh.branch_id = :bid";
+        }
+        if ($start && $end) {
+            $query .= " AND sh.start_time BETWEEN :start_date AND :end_date";
+        }
+
+        $query .= " ORDER BY sh.start_time DESC";
+
+        $stmt = $this->db->prepare($query);
+        if ($status) {
+            $stmt->bindParam(':status', $status);
+        }
+        if ($branchId) {
+            $stmt->bindParam(':bid', $branchId);
+        }
+        if ($start && $end) {
+            $stmt->bindParam(':start_date', $start);
+            $stmt->bindParam(':end_date', $end);
+        }
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getShiftReport($shiftId) {
+        $shifts = $this->getShifts(null, null, null, null);
+        $shift = null;
+
+        foreach ($shifts as $row) {
+            if ((int)$row['id'] === (int)$shiftId) {
+                $shift = $row;
+                break;
+            }
+        }
+
+        if (!$shift) {
+            return null;
+        }
+
+        $salesQuery = "SELECT
+                        s.transaction_id,
+                        s.customer_name,
+                        s.payment_method,
+                        s.subtotal,
+                        s.tax_amount,
+                        s.discount_amount,
+                        s.total,
+                        s.status,
+                        s.created_at,
+                        COALESCE(SUM(si.quantity), 0) as item_count
+                       FROM sales s
+                       LEFT JOIN sale_items si ON s.id = si.sale_id
+                       WHERE s.shift_id = :sid
+                       GROUP BY s.id
+                       ORDER BY s.created_at ASC";
+        $stmt = $this->db->prepare($salesQuery);
+        $stmt->bindParam(':sid', $shiftId);
+        $stmt->execute();
+        $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $returnsQuery = "SELECT
+                            r.id,
+                            r.total_refund,
+                            r.created_at,
+                            s.transaction_id
+                         FROM returns r
+                         JOIN sales s ON r.sale_id = s.id
+                         WHERE r.shift_id = :sid
+                         ORDER BY r.created_at ASC";
+        $stmt = $this->db->prepare($returnsQuery);
+        $stmt->bindParam(':sid', $shiftId);
+        $stmt->execute();
+        $returns = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            "shift" => $shift,
+            "transactions" => $transactions,
+            "returns" => $returns
         ];
     }
 }
